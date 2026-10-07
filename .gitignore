@@ -1,0 +1,14 @@
+# ambiente Python
+venv/
+__pycache__/
+*.pyc
+
+# segredos / config local
+.env
+
+# dados grandes / gerados -- não pertencem ao repo de código
+backups/
+images/
+
+# ficheiros do sistema
+.DS_Store

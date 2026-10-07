@@ -1,0 +1,3800 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Football Scouting</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+:root{
+    --bg:#0A0E12;
+    --panel:#12171F;
+    --panel2:#1A212C;
+    --panel-hover:#212936;
+    --text:#EDF0EA;
+    --muted:#8D97A0;
+    --accent:#F0A730;
+    --accent-ink:#1A1200;
+    --accent2:#39C98C;
+    --yellow:#fbbf24;
+    --red:#FF6E5C;
+    --border:#28313E;
+    --radius:6px;
+    --font-display:'Teko','Segoe UI',sans-serif;
+    --font-body:'Work Sans','Segoe UI',sans-serif;
+    --font-mono:'JetBrains Mono',Consolas,Monaco,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font-body);background:var(--bg);color:var(--text);}
+button,input,select,textarea{font-family:inherit}
+.layout{display:flex;min-height:100vh}
+
+/* ---------- SIDEBAR ---------- */
+aside{
+    width:250px;flex-shrink:0;padding:28px 18px;
+    background:linear-gradient(180deg,#0D131A,#0A0E12);
+    border-right:1px solid var(--border);
+}
+aside.hidden{display:none}
+
+/* ---------- BARRA DE TOPO (páginas de largura total, ex.: perfil) ---------- */
+.topbar-perfil{
+    display:flex;align-items:center;gap:40px;padding:16px 32px;
+    background:linear-gradient(180deg,#0D131A,#0A0E12);border-bottom:1px solid var(--border);
+}
+.topbar-perfil .brand{margin-bottom:0}
+.topbar-perfil nav{display:flex;gap:6px}
+.topbar-perfil nav button{
+    border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:13.5px;font-weight:600;
+    padding:8px 14px;border-radius:4px;font-family:var(--font-body);letter-spacing:.02em;transition:.15s;
+}
+.topbar-perfil nav button:hover{color:var(--text);background:var(--panel2)}
+.topbar-perfil nav button.active{color:var(--text);background:var(--panel2)}
+.brand{font-family:var(--font-display);font-size:24px;font-weight:600;margin-bottom:36px;display:flex;align-items:center;gap:10px;letter-spacing:.02em}
+.brand-mark{width:8px;height:22px;background:var(--accent);flex-shrink:0}
+.brand small{display:block;font-size:11px;font-weight:500;color:var(--muted);margin-top:1px;letter-spacing:.04em;text-transform:uppercase}
+nav button{
+    width:100%;text-align:left;border:0;border-left:3px solid transparent;border-radius:0;padding:11px 12px;margin:1px 0;
+    color:var(--muted);background:transparent;cursor:pointer;font-size:13.5px;font-weight:600;
+    letter-spacing:.02em;transition:.15s;
+}
+nav button.active{background:var(--panel2);color:var(--text);border-left-color:var(--accent)}
+nav button:hover:not(.active){background:var(--panel2);color:var(--text)}
+.side-foot{color:var(--muted);font-size:11.5px;margin-top:40px;line-height:1.6}
+
+/* ---------- MAIN ---------- */
+main{flex:1;padding:34px 40px;overflow:auto}
+h1{font-family:var(--font-display);margin:0 0 6px;font-size:32px;font-weight:600;letter-spacing:.01em}
+.subtitle{color:var(--muted);margin-bottom:26px;font-size:13.5px}
+.page.hidden{display:none}
+
+/* ---------- KPI CARDS ---------- */
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:8px}
+.card{
+    background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--card-accent,var(--border));
+    padding:18px 20px;display:flex;flex-direction:column;gap:6px;
+}
+.metric-label{color:var(--muted);font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.metric{font-family:var(--font-display);font-size:34px;font-weight:600;line-height:1}
+
+/* ---------- PANELS ---------- */
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:24px}
+.panel h3{margin:0 0 18px;font-size:16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-top:18px}
+
+/* ---------- BARS (dashboard) ---------- */
+.bar-row{margin:14px 0}
+.bar-row.clickable{cursor:pointer;transition:.15s;border-radius:4px;margin-left:-8px;margin-right:-8px;padding-left:8px;padding-right:8px}
+.bar-row.clickable:hover{background:var(--panel2)}
+.bar-row.clickable:hover .top span:first-child{color:var(--accent)}
+.bar-row.clickable:active{transform:scale(.98)}
+.bar-row .top{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;color:var(--text)}
+.bar-row .top span:last-child{color:var(--muted)}
+.bar-track{height:8px;border-radius:3px;background:#1A212C;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;background:var(--accent)}
+
+/* ---------- TOOLBAR ---------- */
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px;align-items:center}
+.toolbar input{
+    background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:4px;
+    padding:10px 14px;font-size:13.5px;min-width:170px;
+}
+.toolbar input::placeholder{color:var(--muted)}
+.toolbar-right{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-left:auto}
+.search-box{position:relative;display:flex;align-items:center}
+.search-icon{position:absolute;left:12px;color:var(--muted);pointer-events:none}
+.search-box input{
+    background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:4px;
+    padding:10px 14px;font-size:13.5px;width:100%;min-width:220px;
+    padding-left:36px;padding-right:30px;
+}
+.search-box input::placeholder{color:var(--muted)}
+.filtros-principais .af-field:has(.search-box){flex:1 1 240px}
+.search-clear{
+    position:absolute;right:10px;background:none;border:none;color:var(--muted);cursor:pointer;
+    font-size:13px;padding:4px;line-height:1;border-radius:50%;
+}
+.search-clear:hover{color:var(--text);background:var(--panel2)}
+.pill-group{display:flex;gap:6px;flex-wrap:wrap}
+.pill{
+    border:1px solid var(--border);background:var(--panel2);color:var(--muted);
+    padding:8px 16px;border-radius:6px;font-size:12.5px;font-weight:500;cursor:pointer;transition:.15s;
+    letter-spacing:.01em;
+}
+.pill.active{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.contagem-ativos{
+    display:inline-block;background:var(--accent);color:var(--accent-ink);border-radius:10px;
+    padding:1px 7px;font-size:10px;font-weight:700;font-family:var(--font-body);
+}
+#toggleFiltrosAvancados.tem-filtros-ativos{border-color:var(--accent)}
+.pill:hover:not(.active){color:var(--text);border-color:var(--accent)}
+.pill:active{transform:scale(.95);filter:brightness(1.15)}
+.liga-dropdown-wrap{position:relative;display:inline-block}
+.liga-dropdown-toggle{
+    display:flex;align-items:center;gap:8px;border:1px solid var(--border);background:var(--panel2);color:var(--text);
+    padding:9px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;min-width:200px;
+}
+.liga-dropdown-toggle:hover{border-color:var(--accent)}
+.liga-dropdown-toggle span{margin-left:auto;color:var(--muted)}
+.liga-dropdown-menu{
+    position:absolute;top:calc(100% + 6px);left:0;min-width:220px;background:var(--panel2);
+    border:1px solid var(--border);border-radius:8px;box-shadow:0 10px 24px rgba(0,0,0,.4);z-index:30;overflow:hidden;
+}
+.liga-dropdown-item{display:flex;align-items:center;gap:8px;padding:10px 16px;font-size:13px;cursor:pointer;transition:.1s}
+.liga-dropdown-item:hover{background:var(--panel)}
+.liga-dropdown-item.active{color:var(--accent);font-weight:700}
+.sort-select{
+    background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:6px;
+    padding:10px 14px;font-size:13.5px;cursor:pointer;
+}
+
+/* ---------- PLAYER AVATAR / BADGE ---------- */
+.avatar{
+    width:48px;height:48px;border-radius:4px;flex-shrink:0;font-family:var(--font-display);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:var(--accent-ink);
+}
+.pos-badge{
+    display:inline-block;font-family:var(--font-mono);font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:3px;
+    color:var(--accent-ink);letter-spacing:.02em;
+}
+
+/* ---------- EMBLEMA DO CLUBE ---------- */
+.club-crest{width:20px;height:20px;object-fit:contain;border-radius:3px;vertical-align:-4px;flex-shrink:0}
+.bandeira-pais{height:auto;object-fit:contain;border-radius:2px;vertical-align:middle;flex-shrink:0;margin-right:5px;box-shadow:0 0 0 1px rgba(255,255,255,.08)}
+.club-crest-fallback{
+    display:inline-flex;align-items:center;justify-content:center;border-radius:3px;flex-shrink:0;
+    font-family:var(--font-mono);font-weight:700;color:#fff;font-size:8.5px;vertical-align:-4px;
+}
+.emprestado-badge{
+    display:inline-flex;align-items:center;gap:3px;background:rgba(251,191,36,.15);color:var(--yellow);
+    border:1px solid rgba(251,191,36,.4);border-radius:3px;padding:1px 6px;font-size:10.5px;font-weight:700;
+    white-space:nowrap;vertical-align:middle;margin-left:4px;
+}
+.icon-badge{
+    display:inline-flex;align-items:center;justify-content:center;border-radius:999px;
+    width:18px;height:18px;flex-shrink:0;
+    vertical-align:middle;margin-left:4px;cursor:default;
+}
+.icon-badge svg{display:block}
+.lesionado-badge{background:#ececec;color:#e30613;}
+.potencial-badge{background:rgba(96,165,250,.15);border:1px solid rgba(96,165,250,.4);color:#60a5fa;}
+.tooltip-global{
+    position:fixed;top:0;left:0;max-width:260px;background:#0d1117;color:var(--text);
+    padding:6px 10px;border-radius:5px;font-family:var(--font-body);font-size:11.5px;font-weight:500;
+    line-height:1.35;box-shadow:0 8px 20px rgba(0,0,0,.5);border:1px solid var(--border);
+    z-index:1000;pointer-events:none;opacity:0;transform:translateY(2px);transition:opacity .08s,transform .08s;
+}
+.tooltip-global.visible{opacity:1;transform:translateY(0);}
+/* ---------- CHIPS DE PERCENTIL (estilo FM) ---------- */
+.stat-line .v-chip{
+    font-family:var(--font-mono);font-weight:700;font-size:12px;padding:3px 11px;border-radius:20px;
+    border:1px solid;line-height:1.3;
+}
+.pct-bar-wrap{display:flex;align-items:center;gap:9px;}
+.pct-bar-track{width:56px;height:5px;border-radius:3px;background:var(--border);overflow:hidden;flex-shrink:0;}
+.pct-bar-fill{display:block;height:100%;border-radius:3px;}
+
+/* ---------- SCOUT TERMINAL ---------- */
+.kpi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;margin-bottom:24px;background:var(--border)}
+.kpi-card{
+    background:var(--panel);
+    padding:14px 16px;display:flex;flex-direction:column;gap:4px;
+}
+.kpi-label{color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.kpi-value{font-family:var(--font-display);font-size:26px;font-weight:600;line-height:1.1}
+.kpi-sub{color:var(--muted);font-size:11px}
+
+.club-select{
+    background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:6px;
+    padding:10px 14px;font-size:13.5px;cursor:pointer;min-width:170px;
+}
+
+.filtros-box{
+    background:var(--panel);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;overflow:hidden;
+}
+.filtros-resumo{
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;
+}
+.filtros-resumo-count{color:var(--text);font-size:13.5px}
+.filtros-resumo-count b{color:var(--accent)}
+.filtros-resumo-chips{display:flex;flex-wrap:wrap;gap:8px}
+.filtro-chip{
+    display:inline-flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--border);
+    border-radius:14px;padding:4px 6px 4px 11px;font-size:11px;color:var(--text);
+}
+.filtro-chip button{
+    background:none;border:none;color:var(--muted);
+    width:16px;height:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;line-height:1;font-weight:700;
+}
+.filtro-chip button:hover{background:rgba(255,255,255,.18);color:var(--text)}
+.advanced-filters{
+    display:grid;grid-template-columns:1fr 1fr;gap:10px 40px;align-items:start;
+    padding:0 18px;max-height:0;overflow:hidden;border-top:0 solid var(--border);
+    transition:max-height .25s ease,padding .25s ease;
+}
+.advanced-filters.open{max-height:1500px;padding:20px 18px;border-top-width:1px}
+.af-col{display:flex;flex-direction:column;gap:12px}
+.af-section-title{
+    color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+    border-bottom:1px solid var(--border);padding-bottom:8px;margin-top:6px;
+}
+.af-col .af-section-title:first-child{margin-top:0}
+.af-actions{grid-column:1 / -1;display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
+.af-field.af-field-toggle{flex-direction:row;align-items:center;justify-content:space-between;gap:12px}
+.af-field-toggle label:first-child{font-size:13.5px;color:var(--text);text-transform:none;font-weight:400;letter-spacing:normal}
+.af-switch{position:relative;display:inline-block;width:36px;height:20px;flex-shrink:0;cursor:pointer}
+.af-switch input{opacity:0;width:0;height:0}
+.af-switch-track{
+    position:absolute;inset:0;background:var(--panel2);border:1px solid var(--border);border-radius:11px;transition:.15s;
+}
+.af-switch-track::before{
+    content:"";position:absolute;width:16px;height:16px;left:1px;top:1px;background:var(--text);border-radius:50%;transition:.15s;
+}
+.af-switch input:checked + .af-switch-track{background:var(--accent);border-color:var(--accent)}
+.af-switch input:checked + .af-switch-track::before{transform:translateX(16px);background:var(--accent-ink)}
+.af-switch input:disabled + .af-switch-track{opacity:.4;cursor:not-allowed}
+.af-field-toggle-inline{cursor:help}
+.af-field-toggle-inline label:first-child{color:var(--muted)}
+.af-field-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.af-live{font-family:var(--font-mono);color:var(--accent);font-size:12px;white-space:nowrap}
+#positionPills,#posSecundariaPills{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px}
+#positionPills .pill,#posSecundariaPills .pill{
+    text-align:center;border-radius:6px;font-size:11px;line-height:1.25;padding:8px 5px;
+    font-weight:400;letter-spacing:normal;
+}
+#positionPills .pill.active{font-weight:700}
+#posSecundariaPills .pill.active{background:rgba(57,201,140,.15);color:var(--accent2);border-color:var(--accent2)}
+#nacionalidadePills .pill{border-radius:16px;padding:5px 11px;font-size:11.5px}
+#nacionalidadePills .pill.active{font-weight:600}
+.filtros-principais{
+    display:flex;flex-wrap:wrap;gap:22px;align-items:flex-end;
+    padding:16px 18px;
+}
+.filtros-principais .pill{margin-left:auto}
+.af-field{display:flex;flex-direction:column;gap:6px}
+.af-field label{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+#filtrosAvancados .af-field label{font-size:14px;color:var(--text);font-weight:400;text-transform:none;letter-spacing:normal}
+.af-field-wide{flex-basis:100%}
+.af-range{display:flex;align-items:center;gap:6px;color:var(--muted)}
+.af-range input{
+    width:64px;background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:5px;
+    padding:8px 10px;font-size:13px;font-variant-numeric:tabular-nums;font-family:var(--font-mono);
+}
+.club-select:focus,.sort-select:focus,.af-range input:focus,#playerSearch:focus{outline:none;border-color:var(--accent)}
+#golosPor90Min,#jogosMinInput{font-family:var(--font-mono)}
+
+.sort-col{
+    cursor:pointer;color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;
+    letter-spacing:.03em;user-select:none;transition:.15s;display:inline-flex;align-items:center;gap:4px;
+}
+th.num .sort-col{flex-direction:row-reverse}
+.sort-col:hover{color:var(--text)}
+.sort-col.active{color:var(--accent)}
+.sort-arrow{font-size:9px;width:8px;display:inline-block}
+.player-list{display:flex;flex-direction:column;gap:0}
+.paginacao{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:22px}
+
+/* ---------- COMPARAÇÃO DE JOGADORES ---------- */
+.comparar-toggle{
+    min-width:38px;height:26px;padding:0 8px;border-radius:13px;border:1px solid var(--border);background:var(--panel2);
+    color:var(--muted);cursor:pointer;font-size:10.5px;font-weight:700;letter-spacing:.03em;flex-shrink:0;transition:.15s;
+    display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);
+}
+.comparar-toggle:hover{border-color:var(--accent);color:var(--accent)}
+.comparar-legenda{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px;padding:0 20px 12px}
+.comparar-toggle.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.barra-comparacao{
+    position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:50;
+    background:var(--panel2);border:1px solid var(--border);border-radius:10px;
+    padding:12px 18px;display:flex;align-items:center;gap:14px;box-shadow:0 12px 30px rgba(0,0,0,.5);
+    font-size:13px;font-weight:600;
+}
+.barra-comparacao.hidden{display:none}
+.comparar-table-wrap{overflow-x:auto}
+.comparar-table{width:100%;border-collapse:collapse;font-size:13px}
+.comparar-table th, .comparar-table td{padding:10px 16px;border-bottom:1px solid var(--border);white-space:nowrap}
+.comparar-table th{text-align:center;background:var(--panel)}
+.comparar-table td:first-child, .comparar-table th:first-child{
+    text-align:left;position:sticky;left:0;background:var(--panel);color:var(--muted);
+    font-size:11px;text-transform:uppercase;letter-spacing:.03em;
+}
+.comparar-table td:not(:first-child){text-align:center;font-family:var(--font-mono)}
+.comparar-table tr.titulo td{
+    background:var(--panel2);color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;
+    letter-spacing:.05em;padding:8px 16px;
+}
+.comparar-header-col{padding:20px 16px;text-align:center;vertical-align:top}
+.comparar-remover{
+    background:none;border:0;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;
+    margin-top:6px;
+}
+.comparar-remover:hover{color:var(--red)}
+.comparar-radars{display:flex;flex-direction:column;gap:32px;margin:24px 0}
+.comparar-radar-grupo{display:grid;grid-template-columns:0.8fr 1fr 0.8fr;gap:24px;align-items:start}
+.comparar-radar-direita{display:flex;flex-direction:column;gap:24px}
+.radar-lista-titulo{font-family:var(--font-display);font-size:16px;font-weight:600;margin-bottom:8px;text-align:center}
+.paginacao .pill:disabled{opacity:.35;cursor:not-allowed;pointer-events:none}
+.paginacao-info{color:var(--muted);font-size:12.5px;font-family:var(--font-mono)}
+.player-row{cursor:pointer}
+.player-row-meta{color:var(--muted);font-size:12px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.score-ring{
+    width:56px;height:56px;border-radius:50%;flex-shrink:0;position:relative;transition:transform .15s;
+    background:conic-gradient(var(--ring-color,var(--accent)) calc(var(--score,0)*1%), #1A212C 0);
+}
+.score-ring::before{content:'';position:absolute;inset:5px;background:var(--panel);border-radius:50%}
+.score-ring span{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-display);font-weight:600;font-size:19px;z-index:1;
+}
+.chevron{color:var(--muted);font-size:13px;flex-shrink:0;transition:.2s;display:inline-block}
+.player-row.open .chevron{transform:rotate(180deg)}
+
+.jogador-cell{display:flex;align-items:center;gap:9px}
+.avatar-mini{
+    width:28px;height:28px;border-radius:50%;background:var(--panel);border:1.5px solid var(--border);
+    display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--muted);
+    flex-shrink:0;font-family:var(--font-display);
+}
+.jogador-nome-cell b{display:block;font-size:15.5px;font-weight:600}
+.jogador-club-cell{font-size:13.5px;color:var(--muted);display:flex;align-items:center;gap:4px;margin-top:3px}
+.pos-chip{
+    display:inline-block;background:var(--panel);border:1px solid var(--border);border-radius:4px;
+    padding:2px 7px;font-size:13.5px;color:var(--muted);white-space:nowrap;
+}
+.pos-chip + .pos-chip{margin-left:4px}
+.pos-chip.sec{color:var(--accent2);border-color:var(--accent2)}
+.rating-cell{font-weight:700;color:var(--accent2)}
+
+.player-detail-row{display:none}
+.player-detail-row.open{display:table-row}
+.player-detail-row td{border-bottom:1px solid var(--border)}
+.player-detail{padding:20px 24px 26px}
+.detail-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:26px}
+.detail-grid-3{display:grid;grid-template-columns:0.8fr 1fr 0.8fr;gap:24px;align-items:start}
+.radar-centro{text-align:center}
+.bio-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 18px;margin-bottom:20px}
+.bio-item .l{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.03em}
+.bio-item .v{font-family:var(--font-mono);font-size:13.5px;font-weight:700;margin-top:2px}
+.bio-list{gap:10px}
+.bio-list .bio-item{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.bio-list .bio-item .v{margin-top:0;text-align:right}
+.stat-section{margin-bottom:20px;background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+.stat-section:last-child{margin-bottom:0}
+.stat-section-title{color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.stat-line{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13.5px}
+.stat-line:last-child{border-bottom:none}
+.stat-line .v{font-family:var(--font-mono);font-weight:700}
+.radar-title{color:var(--muted);font-size:12px;text-align:center;margin-top:6px}
+.radar-legend{display:flex;gap:18px;justify-content:center;align-items:center;margin-top:10px;font-family:var(--font-body);font-size:11.5px;color:var(--muted)}
+.radar-legend-item{display:flex;align-items:center;gap:6px}
+.radar-swatch{width:14px;height:0;display:inline-block;flex-shrink:0}
+.radar-swatch-jogador{border-top:3px solid var(--accent);border-radius:2px}
+.radar-swatch-media{border-top:2px dashed var(--muted)}
+.radar-wrap{display:flex;flex-wrap:wrap;align-items:center;gap:8px;justify-content:center}
+.radar-wrap svg{flex:1 1 200px;max-width:230px}
+.radar-lista{flex:1 1 140px;display:flex;flex-direction:column;gap:6px;min-width:130px}
+.radar-item{cursor:pointer;padding:8px 12px;border-radius:8px;border:1px solid transparent;background:var(--panel2);transition:.12s}
+.radar-item:hover{background:#212a38}
+.radar-item.active{border-color:var(--cor-percentil);background:#212a38}
+.radar-item-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.radar-item-valor{font-family:var(--font-mono);font-weight:700;font-size:16px;color:var(--cor-percentil)}
+.radar-item.active .radar-item-valor{color:var(--accent)}
+.radar-item-percentil{font-size:10.5px;color:var(--muted);margin-top:1px}
+.amostra-aviso{color:var(--yellow);font-size:11.5px;text-align:center;margin-top:8px;line-height:1.4}
+
+.mv-section{margin-bottom:20px}
+.similares-valor-alvo{color:var(--muted);font-size:12.5px;margin-bottom:12px}
+.similares-banda{margin-bottom:16px}
+.similares-banda:last-child{margin-bottom:0}
+.similares-banda-titulo{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}
+.similares-aviso{color:var(--muted);font-size:12px;margin-bottom:10px}
+.similares-lista{display:flex;flex-direction:column;gap:6px}
+.similar-card{
+    display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:10px;
+    background:var(--panel2);border:1px solid var(--border);cursor:pointer;transition:border-color .15s;
+}
+.similar-card:hover{border-color:var(--accent)}
+.similar-pct{
+    font-family:var(--font-mono);font-weight:700;font-size:13px;color:var(--accent2);
+    width:42px;text-align:center;flex-shrink:0;
+}
+.similar-info{flex:1;min-width:0}
+.similar-nome{font-weight:700;font-size:13.5px}
+.similar-meta{color:var(--muted);font-size:11.5px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-top:2px}
+.similar-score{font-family:var(--font-mono);font-weight:700;font-size:13px;color:var(--text);flex-shrink:0}
+.heatmap-card{
+    background:var(--panel2);border-radius:14px;box-shadow:0 10px 28px rgba(0,0,0,.4);
+    border:1px solid var(--border);padding:18px 20px;overflow:hidden;
+}
+.heatmap-card .stat-section-title{
+    padding-bottom:12px;margin-bottom:14px;border-bottom:1px solid var(--border);
+}
+.mv-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.mv-header .atual{font-size:15px;font-weight:700}
+.mv-loading{color:var(--muted);font-size:12.5px;padding:10px 0}
+
+/* ---------- PÁGINA DE PERFIL COMPLETO ---------- */
+.perfil-voltar{
+    color:var(--muted);font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;
+    margin-bottom:18px;cursor:pointer;background:none;border:0;font-family:var(--font-body);padding:0;
+}
+.perfil-voltar:hover{color:var(--accent)}
+.perfil-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.perfil-nome{font-family:var(--font-display);font-size:44px;font-weight:600;line-height:1}
+.perfil-sub{display:flex;align-items:center;gap:10px;margin-top:8px}
+.perfil-score{width:80px;height:80px;font-size:26px}
+.perfil-score span{font-size:26px}
+.perfil-divisor{height:2px;background:var(--border);margin:18px 0 26px}
+.perfil-kpis{display:flex;gap:60px;align-items:center;flex-wrap:wrap}
+.perfil-kpi{text-align:center}
+.perfil-kpi .n{font-family:var(--font-display);font-size:34px;font-weight:600;line-height:1}
+.perfil-kpi .l{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em;margin-top:4px}
+.perfil-share{
+    margin-left:auto;background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;
+    padding:9px 16px;font-size:13px;cursor:pointer;font-family:var(--font-body);display:inline-flex;align-items:center;gap:7px;
+}
+.perfil-share:hover{color:var(--accent);border-color:var(--accent)}
+.perfil-share:active{transform:scale(.95);filter:brightness(1.2)}
+.perfil-voltar:active{transform:scale(.97)}
+.perfil-tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:28px}
+.perfil-tab-btn{
+    background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;
+    padding:12px 18px;font-size:13.5px;font-weight:600;font-family:var(--font-body);transition:.15s;
+    display:flex;align-items:center;gap:8px;
+}
+.perfil-tab-btn:hover{color:var(--text)}
+.perfil-tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.perfil-tab-btn:active{transform:scale(.97)}
+.tab-badge{
+    background:var(--panel2);color:var(--muted);font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px;
+    font-family:var(--font-mono);
+}
+.perfil-tab-btn.active .tab-badge{background:var(--accent);color:var(--accent-ink)}
+.perfil-tab-content{display:none}
+.perfil-tab-content.active{display:block}
+
+.trofeus-lista{display:flex;flex-direction:column;gap:10px}
+.trofeu-card{
+    display:flex;align-items:center;gap:18px;padding:14px 18px;border-radius:12px;
+    background:var(--panel2);border:1px solid var(--border);
+}
+.trofeu-qtd{
+    font-family:var(--font-mono);font-weight:700;font-size:20px;color:var(--accent);
+    min-width:46px;text-align:center;flex-shrink:0;
+}
+.trofeu-info{flex:1;min-width:0}
+.trofeu-nome{font-weight:700;font-size:15px}
+.trofeu-epocas{color:var(--muted);font-size:12px;margin-top:4px;line-height:1.5}
+.trofeu-fonte{
+    font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);
+    background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:1px 5px;vertical-align:middle;
+}
+
+.perfil-grid{display:grid;grid-template-columns:220px 1fr 1fr 1.1fr;gap:28px;align-items:start;margin-bottom:28px}
+.perfil-avatar{
+    width:100%;aspect-ratio:1;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-display);font-size:42px;font-weight:600;color:var(--accent-ink);margin-bottom:16px;
+}
+.perfil-lower-grid{display:grid;grid-template-columns:220px 1fr 1.1fr;gap:28px;align-items:start}
+.tab-geral-grid{display:grid;grid-template-columns:220px 1fr 1fr;gap:28px;align-items:stretch}
+.tab-geral-grid > div{display:flex;flex-direction:column}
+.tab-geral-grid > div > svg{flex:1;min-height:0;height:auto}
+.forma-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px}
+.forma-card{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:16px 10px;text-align:center;cursor:default}
+.forma-card-badge{
+    display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;
+    color:#0A0E12;font-family:var(--font-mono);font-weight:700;font-size:13px;margin-bottom:10px;
+}
+.forma-card-jogo{color:var(--muted);font-size:11px;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.forma-card-rating{font-family:var(--font-display);font-size:26px;font-weight:600;line-height:1;margin-bottom:6px}
+.forma-card-stat{color:var(--muted);font-size:12px}
+@media(max-width:900px){
+    .forma-cards{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:600px){
+    .forma-cards{grid-template-columns:repeat(2,1fr)}
+}
+.stat-section-cols{display:grid;grid-template-columns:1fr 1fr;gap:0 24px}
+.posicao-legenda{display:flex;flex-direction:column;gap:8px;margin-top:10px;font-size:12.5px}
+.posicao-legenda .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:middle}
+@media(max-width:1300px){
+    .perfil-grid{grid-template-columns:1fr 1fr}
+    .perfil-lower-grid{grid-template-columns:1fr 1fr}
+    .tab-geral-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+    .stat-section-cols{grid-template-columns:1fr}
+}
+@media(max-width:800px){
+    .perfil-grid{grid-template-columns:1fr}
+    .perfil-lower-grid{grid-template-columns:1fr}
+    .tab-geral-grid{grid-template-columns:1fr}
+}
+
+.transfer-row{
+    display:grid;grid-template-columns:52px 88px 1fr auto auto;gap:10px;align-items:center;
+    padding:9px 0;border-bottom:1px solid var(--border);font-size:12.5px;font-family:var(--font-mono);
+}
+.transfer-row:last-child{border-bottom:none}
+.transfer-row .epoca{color:var(--muted);font-weight:700}
+.transfer-row .clubes{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.transfer-tipo{
+    display:inline-block;padding:2px 8px;border-radius:3px;font-size:11px;font-weight:700;
+    background:var(--panel2);color:var(--muted);white-space:nowrap;
+}
+.transfer-tipo.fee{background:rgba(74,222,128,.15);color:var(--accent2)}
+.transfer-tipo.emprestimo{background:rgba(251,191,36,.15);color:var(--yellow)}
+.transfer-row .valor{font-weight:700;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+
+.jogo-card{
+    background:var(--panel2);border:1px solid var(--border);border-left:3px solid var(--border);
+    border-radius:10px;padding:12px 16px;margin-bottom:10px;cursor:pointer;transition:.15s;
+}
+.jogo-card:hover{border-color:var(--accent)}
+.jogo-linha{display:flex;align-items:center;justify-content:center;gap:18px}
+.jogo-lado{display:flex;align-items:center;gap:8px;flex:1;font-size:14px;font-weight:600}
+.jogo-lado-casa{justify-content:flex-end;text-align:right}
+.jogo-lado-fora{justify-content:flex-start;text-align:left}
+.jogo-placar{
+    font-family:var(--font-mono);font-weight:700;font-size:18px;flex-shrink:0;
+    min-width:64px;text-align:center;color:var(--text);
+}
+.jogo-meta{color:var(--muted);font-size:11px;text-align:center;margin-top:8px}
+.jogo-meta .chevron{display:inline-block;transition:.15s}
+.jogo-card.open .jogo-meta .chevron{transform:rotate(180deg)}
+.jogo-detalhe{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);cursor:default}
+.jogo-card.open .jogo-detalhe{display:block}
+.jogo-golo{font-size:13px;padding:4px 0;color:var(--text);text-align:center}
+.jogo-golo.empty{color:var(--muted)}
+.jogo-golo-linha{display:flex;gap:16px;padding:3px 0}
+.jogo-golo-lado{flex:1;font-size:13px;color:var(--text)}
+.jogo-golo-esq{text-align:right}
+.jogo-golo-dir{text-align:left}
+.jogo-golo-lado .min{font-family:var(--font-mono);color:var(--muted);font-weight:700}
+.jogo-mvp{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:13px;color:var(--yellow)}
+.resultados-grupo{margin-bottom:28px}
+.resultados-grupo:last-child{margin-bottom:0}
+
+/* ---------- TABLES (clubes) ---------- */
+.table-wrap{overflow:auto;border:1px solid var(--border);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+th{color:var(--muted);font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.03em;background:var(--panel2)}
+tr:hover td{background:var(--panel-hover)}
+.player-detail-row:hover td{background:transparent}
+.player-row.open td{background:var(--panel-hover)}
+th.num,td.num{font-family:var(--font-mono);text-align:right}
+.clickable-row{cursor:pointer}
+.clickable-row:hover td{color:var(--accent)}
+.clickable-row:active td{opacity:.7}
+
+.hidden{display:none}
+.error{color:var(--red);margin-top:14px}
+.empty{color:var(--muted);padding:30px;text-align:center}
+
+@media(max-width:1100px){
+    .cards{grid-template-columns:repeat(2,1fr)}
+    .kpi-grid{grid-template-columns:repeat(3,1fr)}
+    .grid2{grid-template-columns:1fr}
+    .grid3{grid-template-columns:1fr}
+    aside{width:200px}
+}
+@media(max-width:900px){
+    .detail-grid{grid-template-columns:1fr}
+    .detail-grid-3{grid-template-columns:1fr}
+    .comparar-radar-grupo{grid-template-columns:1fr}
+    .player-table-wrap th:nth-child(n+2):nth-child(-n+7),
+    .player-table-wrap td:nth-child(n+2):nth-child(-n+7){display:none}
+}
+@media(max-width:700px){
+    .layout{display:block}
+    aside{width:100%}
+    main{padding:20px}
+    .player-grid{grid-template-columns:1fr}
+    .kpi-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<header id="topbarPerfil" class="topbar-perfil hidden">
+    <div class="brand"><div class="brand-mark"></div><div>Football<small>Scouting</small></div></div>
+    <nav>
+        <button data-page="dashboard">Dashboard</button>
+        <button data-page="jogadores">Jogadores</button>
+        <button data-page="clubes">Clubes</button>
+    </nav>
+</header>
+<div class="layout" id="layoutPrincipal">
+    <aside>
+        <div class="brand"><div class="brand-mark"></div><div>Football<small>Scouting</small></div></div>
+        <nav>
+            <button class="active" data-page="dashboard">Dashboard</button>
+            <button data-page="jogadores">Jogadores</button>
+            <button data-page="clubes">Clubes</button>
+        </nav>
+        <p class="side-foot">Dados via PostgreSQL<br>Fonte: API-Football</p>
+    </aside>
+    <main>
+
+        <!-- ============ DASHBOARD ============ -->
+        <section id="dashboard" class="page">
+            <h1>Dashboard</h1>
+            <div class="subtitle">Visão geral dos dados de scouting.</div>
+            <div class="cards">
+                <div class="card" style="--card-accent:var(--accent)">
+                    <div class="metric-label">Jogadores</div>
+                    <div id="metricPlayers" class="metric">—</div>
+                </div>
+                <div class="card" style="--card-accent:var(--accent2)">
+                    <div class="metric-label">Clubes</div>
+                    <div id="metricClubs" class="metric">—</div>
+                </div>
+                <div class="card" style="--card-accent:var(--yellow)">
+                    <div class="metric-label">Cartões amarelos</div>
+                    <div id="metricYellow" class="metric">—</div>
+                </div>
+                <div class="card" style="--card-accent:var(--red)">
+                    <div class="metric-label">Cartões vermelhos</div>
+                    <div id="metricRed" class="metric">—</div>
+                </div>
+            </div>
+
+            <div class="panel" style="margin-top:18px">
+                <h3>Classificação — 2024/25</h3>
+                <div class="liga-dropdown-wrap" style="margin-bottom:14px">
+                    <button id="ligaDropdownToggle" class="liga-dropdown-toggle" onclick="toggleLigaDropdown()"></button>
+                    <div id="ligaDropdownMenu" class="liga-dropdown-menu hidden"></div>
+                </div>
+                <div id="classificacaoTable"></div>
+            </div>
+            <div class="grid3">
+                <div class="panel">
+                    <h3>Melhores marcadores</h3>
+                    <div id="topGolosChart"></div>
+                </div>
+                <div class="panel">
+                    <h3>Mais assistências</h3>
+                    <div id="topAssistChart"></div>
+                </div>
+                <div class="panel">
+                    <h3>Melhor % conversão de remates</h3>
+                    <div id="topConversaoChart"></div>
+                </div>
+            </div>
+            <div class="grid3">
+                <div class="panel">
+                    <h3>Mais cartões amarelos</h3>
+                    <div id="topAmarelosChart"></div>
+                </div>
+                <div class="panel">
+                    <h3>Mais defesas</h3>
+                    <div id="topDefesasChart"></div>
+                </div>
+                <div class="panel">
+                    <h3>Mais desarmes</h3>
+                    <div id="topDesarmesChart"></div>
+                </div>
+            </div>
+            <div class="grid3">
+                <div class="panel">
+                    <h3>Golos vs. Golos Esperados (xG)</h3>
+                    <div id="topXgChart"></div>
+                </div>
+                <div class="panel">
+                    <h3>Mais interceções</h3>
+                    <div id="topIntercecoesChart"></div>
+                </div>
+                <div class="panel">
+                    <h3>Mais cortes (alívios)</h3>
+                    <div id="topCortesChart"></div>
+                </div>
+            </div>
+            <div class="grid2">
+                <div class="panel">
+                    <h3>Mais passes-chave</h3>
+                    <div id="topPassesChaveChart"></div>
+                </div>
+                <div class="panel">
+                    <h3>Melhor % de passe certo</h3>
+                    <div id="topPassePctChart"></div>
+                </div>
+            </div>
+            <div class="grid3">
+                <div class="panel">
+                    <h3>Assistências vs. Esperadas (xA)</h3>
+                    <div id="topXaChart"></div>
+                </div>
+                <div class="panel">
+                    <h3>Mais ações defensivas /90</h3>
+                    <div id="topAcoesDefensivasChart"></div>
+                </div>
+                <div class="panel">
+                    <h3>Maior valorização de mercado</h3>
+                    <div id="topValorizacaoChart"></div>
+                </div>
+            </div>
+            <div class="grid2">
+                <div class="panel">
+                    <h3>Melhor custo-benefício (G+A por M€)</h3>
+                    <div id="topCustoBeneficioChart"></div>
+                </div>
+                <div class="panel">
+                    <h3>Maior risco de lesão (% da época)</h3>
+                    <div id="topRiscoLesaoChart"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ JOGADORES (SCOUT TERMINAL) ============ -->
+        <section id="jogadores" class="page hidden">
+            <h1>Scout Terminal</h1>
+            <div class="subtitle">Score de scouting, radar por posição e estatísticas detalhadas — por época.</div>
+
+            <div class="toolbar">
+                <div id="seasonPills" class="pill-group"></div>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">Jogadores</div>
+                    <div id="kpiJogadores" class="kpi-value">—</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Clubes</div>
+                    <div id="kpiClubes" class="kpi-value">—</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Idade Média</div>
+                    <div id="kpiIdade" class="kpi-value">—</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Melhor Marcador</div>
+                    <div id="kpiMarcador" class="kpi-value">—</div>
+                    <div id="kpiMarcadorSub" class="kpi-sub"></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Rating mais alto</div>
+                    <div id="kpiRating" class="kpi-value">—</div>
+                    <div id="kpiRatingSub" class="kpi-sub"></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Top Score Scouting</div>
+                    <div id="kpiScore" class="kpi-value">—</div>
+                    <div id="kpiScoreSub" class="kpi-sub"></div>
+                </div>
+            </div>
+
+            <div class="filtros-box">
+                <div class="filtros-principais">
+                    <div class="af-field">
+                        <label>Nome do jogador</label>
+                        <div class="search-box">
+                            <svg class="search-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            <input id="playerSearch" placeholder="ex: Gyökeres, Trincão...">
+                            <button id="limparPesquisa" class="search-clear hidden" title="Limpar pesquisa">✕</button>
+                        </div>
+                    </div>
+                    <div class="af-field">
+                        <label>Competição</label>
+                        <select id="leagueSelect" class="club-select">
+                            <option value="">Todas</option>
+                        </select>
+                    </div>
+                    <div class="af-field">
+                        <label>Clube</label>
+                        <select id="clubSelect" class="club-select">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+                    <div class="af-field">
+                        <label>Jogos mínimos</label>
+                        <input type="number" id="jogosMinInput" class="club-select" style="width:90px" min="0" value="0">
+                    </div>
+                    <button id="limparFiltrosPrincipais" class="pill">Limpar filtros</button>
+                    <button id="toggleFiltrosAvancados" class="pill">Pesquisa avançada <span id="badgeFiltrosAvancados" class="contagem-ativos hidden"></span> <span id="chevronFiltrosAvancados">▾</span></button>
+                </div>
+
+                <div id="filtrosAvancados" class="advanced-filters">
+                    <div class="af-col">
+                        <div class="af-section-title">Posição principal</div>
+                        <div id="positionPills" class="pill-group"></div>
+
+                        <div class="af-section-title">Posição secundária (opcional)</div>
+                        <div id="posSecundariaPills" class="pill-group"></div>
+                        <div class="af-field af-field-toggle af-field-toggle-inline" title="Ainda sem dados que distingam posição dominante de posição ocasional -- por agora não filtra.">
+                            <label for="filtroDominaSecundaria">Jogador tem de dominar a secundária (não só ter jogado lá)</label>
+                            <label class="af-switch">
+                                <input type="checkbox" id="filtroDominaSecundaria" disabled>
+                                <span class="af-switch-track"></span>
+                            </label>
+                        </div>
+
+                        <div class="af-section-title">Performance</div>
+                        <div class="af-field">
+                            <div class="af-field-head"><label>Rating médio</label><span id="ratingLive" class="af-live">qualquer</span></div>
+                            <div class="af-range">
+                                <input type="number" id="ratingMin" placeholder="Mín." step="0.1" min="0" max="10">
+                                <span>—</span>
+                                <input type="number" id="ratingMax" placeholder="Máx." step="0.1" min="0" max="10">
+                            </div>
+                        </div>
+                        <div class="af-field">
+                            <div class="af-field-head"><label>Golos (por90)</label><span id="golosPor90Live" class="af-live">qualquer</span></div>
+                            <input type="number" id="golosPor90Min" placeholder="ex: 0,3" step="0.1" min="0" class="club-select" style="width:120px">
+                        </div>
+                        <div class="af-field">
+                            <div class="af-field-head"><label>xG – Golos (eficácia)</label><span id="xgEficaciaLive" class="af-live">qualquer</span></div>
+                            <div class="af-range">
+                                <input type="number" id="xgEficaciaMin" placeholder="min" step="0.5">
+                                <span>—</span>
+                                <input type="number" id="xgEficaciaMax" placeholder="max" step="0.5">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="af-col">
+                        <div class="af-section-title">Físico &amp; perfil</div>
+                        <div class="af-field">
+                            <div class="af-field-head"><label>Idade</label><span id="idadeLive" class="af-live">qualquer</span></div>
+                            <div class="af-range">
+                                <input type="number" id="idadeMin" placeholder="Mín." min="14" max="45">
+                                <span>—</span>
+                                <input type="number" id="idadeMax" placeholder="Máx." min="14" max="45">
+                            </div>
+                        </div>
+                        <div class="af-field">
+                            <div class="af-field-head"><label>Altura (cm)</label><span id="alturaLive" class="af-live">qualquer</span></div>
+                            <div class="af-range">
+                                <input type="number" id="alturaMin" placeholder="Mín." min="150" max="210">
+                                <span>—</span>
+                                <input type="number" id="alturaMax" placeholder="Máx." min="150" max="210">
+                            </div>
+                        </div>
+                        <div class="af-field">
+                            <label>Pé preferencial</label>
+                            <select id="filtroPe" class="sort-select">
+                                <option value="">Qualquer</option>
+                                <option value="direito">Direito</option>
+                                <option value="esquerdo">Esquerdo</option>
+                                <option value="ambos">Ambidestro</option>
+                            </select>
+                        </div>
+
+                        <div class="af-section-title">Contrato &amp; mercado</div>
+                        <div class="af-field">
+                            <div class="af-field-head"><label>Valor de mercado (M€)</label><span id="valorMercadoLive" class="af-live">qualquer</span></div>
+                            <div class="af-range">
+                                <input type="number" id="valorMercadoMin" placeholder="Mín." min="0" step="0.5">
+                                <span>—</span>
+                                <input type="number" id="valorMercadoMax" placeholder="Máx." min="0" step="0.5">
+                            </div>
+                        </div>
+                        <div class="af-field">
+                            <label>Contrato termina em</label>
+                            <select id="filtroContratoSelect" class="sort-select">
+                                <option value="">Qualquer prazo</option>
+                                <option value="0.5">Até 6 meses</option>
+                                <option value="1">Último ano</option>
+                                <option value="2">Até 2 anos</option>
+                                <option value="3">Até 3 anos</option>
+                                <option value="4+">4 ou mais anos</option>
+                                <option value="0">Já expirado</option>
+                            </select>
+                        </div>
+                        <div class="af-field af-field-toggle">
+                            <label for="filtroEmprestados">Apenas jogadores emprestados</label>
+                            <label class="af-switch">
+                                <input type="checkbox" id="filtroEmprestados">
+                                <span class="af-switch-track"></span>
+                            </label>
+                        </div>
+                        <div class="af-field af-field-toggle">
+                            <label for="filtroTaca">Jogou a Taça de Portugal</label>
+                            <label class="af-switch">
+                                <input type="checkbox" id="filtroTaca">
+                                <span class="af-switch-track"></span>
+                            </label>
+                        </div>
+
+                        <div class="af-section-title">Nacionalidade</div>
+                        <div id="nacionalidadePills" class="pill-group"></div>
+                    </div>
+
+                    <div class="af-actions">
+                        <button id="limparFiltrosAvancados" class="pill">Limpar</button>
+                        <button id="procurarFiltrosAvancados" class="pill active">Procurar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filtros-resumo">
+                <div id="filtrosResumoCount" class="filtros-resumo-count"></div>
+                <div id="filtrosResumoChips" class="filtros-resumo-chips"></div>
+            </div>
+
+            <div class="comparar-legenda"><span class="comparar-toggle" style="pointer-events:none">VS</span> Clica para adicionares o jogador à comparação (escolhe 2 a 4)</div>
+
+            <div class="table-wrap player-table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th><span class="sort-col" data-sort="nome">Jogador<span class="sort-arrow"></span></span></th>
+                            <th>Posição</th>
+                            <th class="num"><span class="sort-col" data-sort="idade">Idade<span class="sort-arrow"></span></span></th>
+                            <th class="num"><span class="sort-col" data-sort="jogos">Jogos<span class="sort-arrow"></span></span></th>
+                            <th class="num"><span class="sort-col" data-sort="golos">Golos<span class="sort-arrow"></span></span></th>
+                            <th class="num"><span class="sort-col" data-sort="assistencias">Assist.<span class="sort-arrow"></span></span></th>
+                            <th class="num"><span class="sort-col" data-sort="classificacao_media">Rating<span class="sort-arrow"></span></span></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="playersGrid"></tbody>
+                </table>
+            </div>
+            <div id="paginacao" class="paginacao"></div>
+        </section>
+
+        <!-- ============ CLUBES ============ -->
+        <section id="clubes" class="page hidden">
+            <h1>Clubes</h1>
+            <div class="subtitle">Clubes registados na base de dados.</div>
+            <div class="panel"><div id="clubsTable"></div></div>
+        </section>
+
+        <!-- ============ PERFIL DE JOGADOR ============ -->
+        <section id="perfil" class="page hidden">
+            <div id="perfilContent"></div>
+        </section>
+
+        <!-- ============ PERFIL DE CLUBE ============ -->
+        <section id="clube" class="page hidden">
+            <div id="clubeContent"></div>
+        </section>
+
+        <!-- ============ COMPARAÇÃO DE JOGADORES ============ -->
+        <section id="comparar" class="page hidden">
+            <div id="compararContent"></div>
+        </section>
+
+    </main>
+</div>
+
+<div id="barraComparacao" class="barra-comparacao hidden">
+    <span id="barraComparacaoTexto"></span>
+    <button class="pill" onclick="limparComparacao()">Limpar</button>
+    <button class="pill active" onclick="abrirComparacao()">Comparar</button>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+function esc(v){
+    if (v === null || v === undefined) return '—';
+    return String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ---------- tooltip instantâneo (substitui o title nativo, que tem delay) ---------- */
+const tooltipGlobal = document.createElement('div');
+tooltipGlobal.className = 'tooltip-global';
+document.body.appendChild(tooltipGlobal);
+
+document.addEventListener('mouseover', e => {
+    const el = e.target.closest('[data-tooltip]');
+    if (!el) return;
+    tooltipGlobal.textContent = el.dataset.tooltip;
+    tooltipGlobal.classList.add('visible');
+    const rect = el.getBoundingClientRect();
+    const tRect = tooltipGlobal.getBoundingClientRect();
+    let top = rect.top - tRect.height - 8;
+    if (top < 4) top = rect.bottom + 8;
+    let left = rect.left + rect.width / 2 - tRect.width / 2;
+    left = Math.max(4, Math.min(left, window.innerWidth - tRect.width - 4));
+    tooltipGlobal.style.top = `${top}px`;
+    tooltipGlobal.style.left = `${left}px`;
+});
+document.addEventListener('mouseout', e => {
+    const el = e.target.closest('[data-tooltip]');
+    if (!el || (e.relatedTarget && el.contains(e.relatedTarget))) return;
+    tooltipGlobal.classList.remove('visible');
+});
+
+// Nome do país (como guardado na BD, em português via Transfermarkt) -> código ISO 3166-1 alpha-2.
+// Construído a partir dos 123 valores distintos que já existem em jogadores.nacionalidade.
+const PAIS_PARA_ISO = {
+    'África do Sul': 'ZA', 'Albânia': 'AL', 'Alemanha': 'DE', 'Andorra': 'AD', 'Angola': 'AO',
+    'Argélia': 'DZ', 'Argentina': 'AR', 'Austrália': 'AU', 'Áustria': 'AT', 'Bélgica': 'BE',
+    'Benim': 'BJ', 'Bielorrússia': 'BY', 'Bósnia-Herzegovina': 'BA', 'Brasil': 'BR', 'Bulgária': 'BG',
+    'Burkina Faso': 'BF', 'Burundi': 'BI', 'Cabo Verde': 'CV', 'Camarões': 'CM', 'Canadá': 'CA',
+    'Chile': 'CL', 'Chipre': 'CY', 'Colômbia': 'CO', 'Comores': 'KM', 'Congo': 'CG',
+    'Coreia do Sul': 'KR', 'Costa do Marfim': 'CI', 'Costa Rica': 'CR', 'Croácia': 'HR', 'Cuba': 'CU',
+    'Curacao': 'CW', 'Dinamarca': 'DK', 'Egito': 'EG', 'Emirados Árabes Unidos': 'AE', 'Equador': 'EC',
+    'Eritreia': 'ER', 'Escócia': 'GB-SCT', 'Eslováquia': 'SK', 'Eslovénia': 'SI', 'Espanha': 'ES',
+    'Estados Unidos': 'US', 'Estónia': 'EE', 'Filipinas': 'PH', 'Finlândia': 'FI', 'França': 'FR',
+    'Gabão': 'GA', 'Gâmbia': 'GM', 'Gana': 'GH', 'Geórgia': 'GE', 'Grécia': 'GR',
+    'Guadalupe': 'GP', 'Guiana Francesa': 'GF', 'Guiné': 'GN', 'Guiné Bissau': 'GW', 'Guiné Equatorial': 'GQ',
+    'Haiti': 'HT', 'Holanda': 'NL', 'Honduras': 'HN', 'Hungria': 'HU', 'Ilhas Faroe': 'FO',
+    'Inglaterra': 'GB-ENG', 'Iraque': 'IQ', 'Irlanda': 'IE', 'Islândia': 'IS', 'Israel': 'IL',
+    'Itália': 'IT', 'Japão': 'JP', 'Jordânia': 'JO', 'Kosovo': 'XK', 'Líbia': 'LY',
+    'Lituânia': 'LT', 'Luxemburgo': 'LU', 'Macedónia do Norte': 'MK', 'Madagascar': 'MG', 'Malásia': 'MY',
+    'Mali': 'ML', 'Malta': 'MT', 'Marrocos': 'MA', 'Martinica': 'MQ', 'Maurícias': 'MU',
+    'Mauritânia': 'MR', 'México': 'MX', 'Moçambique': 'MZ', 'Montenegro': 'ME', 'Neocaledónia': 'NC',
+    'Nigéria': 'NG', 'Noruega': 'NO', 'Nova Zelândia': 'NZ', 'País de Gales': 'GB-WLS', 'Palestina': 'PS',
+    'Panamá': 'PA', 'Paraguai': 'PY', 'Perú': 'PE', 'Polónia': 'PL', 'Porto Rico': 'PR',
+    'Portugal': 'PT', 'Quénia': 'KE', 'RD do Congo': 'CD', 'República Central Africana': 'CF',
+    'República Checa': 'CZ', 'República Dominicana': 'DO', 'Roménia': 'RO', 'Rússia': 'RU',
+    'São Tomé and Príncipe': 'ST', 'Senegal': 'SN', 'Serra Leoa': 'SL', 'Sérvia': 'RS',
+    'Sint Maarten': 'SX', 'Síria': 'SY', 'Somália': 'SO', 'Suécia': 'SE', 'Suiça': 'CH',
+    'Suriname': 'SR', 'Togo': 'TG', 'Trinidad e Tobago': 'TT', 'Tunísia': 'TN', 'Turquia': 'TR',
+    'Ucrânia': 'UA', 'Uruguai': 'UY', 'Uzbequistão': 'UZ', 'Venezuela': 'VE', 'Zimbabué': 'ZW',
+};
+
+// Códigos sem bandeira "normal" via regional-indicator (subdivisões do
+// Reino Unido, e Kosovo que não tem código ISO oficial) -- usam a
+// sequência especial de emoji de bandeira preta + tag characters.
+const BANDEIRAS_ESPECIAIS = {
+    'GB-ENG': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+    'GB-SCT': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+    'GB-WLS': '🏴󠁧󠁢󠁷󠁬󠁳󠁿',
+    'XK': '🇽🇰',
+};
+
+function codigoParaEmoji(codigo){
+    if (BANDEIRAS_ESPECIAIS[codigo]) return BANDEIRAS_ESPECIAIS[codigo];
+    return codigo.toUpperCase().replace(/./g, c => String.fromCodePoint(127397 + c.charCodeAt(0)));
+}
+
+function bandeiraEmoji(nacionalidade){
+    const codigo = PAIS_PARA_ISO[nacionalidade];
+    return codigo ? codigoParaEmoji(codigo) : '';
+}
+
+function nacionalidadeHTML(nacionalidade, largura){
+    if (!nacionalidade) return esc(nacionalidade);
+    largura = largura || 22;
+    const codigo = PAIS_PARA_ISO[nacionalidade];
+    const bandeira = codigo
+        ? `<img src="https://flagcdn.com/w40/${codigo.toLowerCase()}.png" alt="" class="bandeira-pais" style="width:${largura}px" onerror="this.style.display='none'">`
+        : '';
+    return `${bandeira}${esc(nacionalidade)}`;
+}
+
+async function api(url){
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(await r.text());
+    return r.json();
+}
+
+/* ---------- cores por posição (gk/def/mid/fwd) ---------- */
+const POSITION_COLORS = {
+    'Guarda-Redes': '#9C8CFF',
+    'Defesa Central': '#39C98C',
+    'Lateral Direito': '#39C98C',
+    'Lateral Esquerdo': '#39C98C',
+    'Médio Defensivo': '#F0A730',
+    'Médio Centro': '#F0A730',
+    'Médio Ofensivo': '#F0A730',
+    'Médio Direito': '#F0A730',
+    'Médio Esquerdo': '#F0A730',
+    'Extremo Direito': '#FF6E5C',
+    'Extremo Esquerdo': '#FF6E5C',
+    'Ponta de Lança': '#FF6E5C',
+    'Segundo Avançado': '#FF6E5C',
+};
+function positionColor(pos){ return POSITION_COLORS[pos] || '#8D97A0'; }
+
+function initials(nome){
+    if (!nome) return '?';
+    const partes = nome.trim().split(/\s+/);
+    return (partes[0][0] + (partes[partes.length - 1][0] || '')).toUpperCase();
+}
+
+/* ---------- emblema do clube (real via Transfermarkt, com fallback colorido) ---------- */
+const CORES_CLUBE = ['#F0A730', '#39C98C', '#FF6E5C', '#9C8CFF', '#3BA9E0', '#E056A0', '#6BCB77', '#E0A83B'];
+
+function corDoClube(nome){
+    if (!nome) return '#5A6472';
+    let hash = 0;
+    for (let i = 0; i < nome.length; i++) hash = (hash * 31 + nome.charCodeAt(i)) >>> 0;
+    return CORES_CLUBE[hash % CORES_CLUBE.length];
+}
+
+function clubeIniciais(nome){
+    if (!nome) return '?';
+    const palavras = nome.trim().split(/\s+/).filter(w => !['de', 'da', 'do', 'fc', 'sc', 'cd', 'cf', 'sad'].includes(w.toLowerCase()));
+    const base = palavras.length ? palavras : nome.trim().split(/\s+/);
+    return base.slice(0, 2).map(w => w[0]).join('').toUpperCase();
+}
+
+function crestHTML(nomeClube, transfermarktId, size){
+    size = size || 20;
+    const cor = corDoClube(nomeClube);
+    const iniciais = clubeIniciais(nomeClube);
+    const fallbackDiv = `<div class="club-crest-fallback" style="width:${size}px;height:${size}px;background:${cor};font-size:${Math.round(size * 0.42)}px">${esc(iniciais)}</div>`;
+    if (transfermarktId){
+        const url = `https://img.a.transfermarkt.technology/wappen/head/${transfermarktId}.png`;
+        return `<img src="${url}" alt="${esc(nomeClube)}" class="club-crest" style="width:${size}px;height:${size}px" data-fallback="${esc(fallbackDiv)}" onerror="this.outerHTML=this.dataset.fallback">`;
+    }
+    return fallbackDiv;
+}
+
+function emprestadoBadgeHTML(clubeDono){
+    if (!clubeDono) return '';
+    return `<span class="emprestado-badge" title="Emprestado por ${esc(clubeDono)}">⇄ Emprestado por ${esc(clubeDono)}</span>`;
+}
+
+function lesionadoBadgeHTML(tipoLesao, dias){
+    if (!tipoLesao) return '';
+    const diasTxt = dias !== null && dias !== undefined ? ` · ${dias}d` : '';
+    return `<span class="icon-badge lesionado-badge" data-tooltip="Lesionado: ${esc(tipoLesao)}${diasTxt}"><svg viewBox="0 0 24 24" width="11" height="11"><path fill="currentColor" d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z"/></svg></span>`;
+}
+
+function potencialBadgeHTML(jovemPotencial){
+    if (!jovemPotencial) return '';
+    return `<span class="icon-badge potencial-badge" data-tooltip="Jovem Promessa"><svg viewBox="0 0 24 24" width="11" height="11"><path fill="currentColor" d="M12 2 22 9 12 22 2 9Z"/></svg></span>`;
+}
+
+/* ---------- cor do chip de percentil (estilo Football Manager) ---------- */
+function percentilCor(p){
+    if (p === null || p === undefined) return null;
+    if (p >= 70) return '#39C98C';
+    if (p >= 40) return '#fbbf24';
+    return '#FF6E5C';
+}
+
+function renderStatLinha(linha){
+    const [l, v, pct] = linha;
+    if (pct === null || pct === undefined){
+        return `<div class="stat-line"><span>${esc(l)}</span><span class="v">${esc(v)}</span></div>`;
+    }
+    const cor = percentilCor(pct);
+    return `<div class="stat-line">
+        <span>${esc(l)}</span>
+        <span class="pct-bar-wrap">
+            <span class="pct-bar-track" title="Percentil ${Math.round(pct)}"><span class="pct-bar-fill" style="width:${pct}%;background:${cor}"></span></span>
+            <span class="v-chip" style="background:${cor}22;color:${cor};border-color:${cor}66">${esc(v)}</span>
+        </span>
+    </div>`;
+}
+
+function renderStatSectionSplit(sec){
+    const meio = Math.ceil(sec.linhas.length / 2);
+    const esquerda = sec.linhas.slice(0, meio);
+    const direita = sec.linhas.slice(meio);
+    return `
+        <div class="stat-section">
+            <div class="stat-section-title">${esc(sec.titulo)}</div>
+            <div class="stat-section-cols">
+                <div>${esquerda.map(renderStatLinha).join('')}</div>
+                <div>${direita.map(renderStatLinha).join('')}</div>
+            </div>
+        </div>
+    `;
+}
+
+/* ---------- barras genéricas (dashboard) ---------- */
+function drawBars(id, entries){
+    const max = Math.max(...entries.map(e => e.value), 1);
+    $(id).innerHTML = entries.map(e => `
+        <div class="bar-row${e.jogadorId ? ' clickable' : ''}"${e.jogadorId ? ` onclick="abrirPerfilCompleto(${e.jogadorId})"` : ''}>
+            <div class="top"><span>${esc(e.label)}</span><span>${esc(e.display ?? e.value)}</span></div>
+            <div class="bar-track"><div class="bar-fill" style="width:${e.value / max * 100}%"></div></div>
+        </div>
+    `).join('') || '<p class="empty">Sem dados.</p>';
+}
+
+/* ============================================================
+   DASHBOARD
+============================================================ */
+let ligaClassificacaoAtual = 'Primeira Liga';
+let dashboardData = null;
+
+const LIGA_PARA_COMPETICAO = {'Primeira Liga': 'Primeira Liga', 'Liga Portugal 2': 'Segunda Liga', 'La Liga': 'La Liga', 'Ligue 1': 'Ligue 1', 'Eliteserien': 'Eliteserien', 'Jupiler Pro League': 'Jupiler Pro League'};
+const LIGA_PARA_ID_SOFASCORE = {'Primeira Liga': 238, 'Liga Portugal 2': 239, 'La Liga': 8, 'Eliteserien': 20, 'Jupiler Pro League': 38};
+const LIGA_PARA_ISO = {'Primeira Liga': 'pt', 'Liga Portugal 2': 'pt', 'La Liga': 'es', 'Ligue 1': 'fr', 'Eliteserien': 'no', 'Jupiler Pro League': 'be'};
+const COMPETICAO_PAIS = {
+    'Primeira Liga': { pais: 'Portugal', iso: 'PT' },
+    'Segunda Liga': { pais: 'Portugal', iso: 'PT' },
+    'La Liga': { pais: 'Espanha', iso: 'ES' },
+    'Ligue 1': { pais: 'França', iso: 'FR' },
+    'Jupiler Pro League': { pais: 'Bélgica', iso: 'BE' },
+    'Eliteserien': { pais: 'Noruega', iso: 'NO' },
+};
+
+function renderClassificacaoTable(rows){
+    if (!rows.length) return '<p class="empty">Sem classificação disponível.</p>';
+    return `
+        <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th class="num">#</th><th>Clube</th><th class="num">J</th><th class="num">V</th><th class="num">E</th><th class="num">D</th>
+                    <th class="num">GM</th><th class="num">GS</th><th class="num">DG</th><th class="num">Pts</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${rows.map(r => `
+                    <tr class="clickable-row" onclick="abrirClubePagina(${r.clube_transfermarkt_id})">
+                        <td class="num">${r.posicao}</td>
+                        <td>${crestHTML(r.clube, r.clube_transfermarkt_id, 20)} ${esc(r.clube)}</td>
+                        <td class="num">${r.jogos}</td>
+                        <td class="num">${r.vitorias}</td>
+                        <td class="num">${r.empates}</td>
+                        <td class="num">${r.derrotas}</td>
+                        <td class="num">${r.golos_marcados}</td>
+                        <td class="num">${r.golos_sofridos}</td>
+                        <td class="num">${r.diferenca > 0 ? '+' + r.diferenca : r.diferenca}</td>
+                        <td class="num"><strong>${r.pontos}</strong></td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+        </div>
+    `;
+}
+
+async function loadClassificacao(){
+    const rows = await api(`/api/classificacao?liga=${encodeURIComponent(ligaClassificacaoAtual)}`);
+    $('classificacaoTable').innerHTML = renderClassificacaoTable(rows);
+}
+
+const LIGAS_CLASSIFICACAO = ['Primeira Liga', 'Liga Portugal 2', 'La Liga', 'Ligue 1', 'Eliteserien', 'Jupiler Pro League'];
+
+function bandeiraLigaHTML(liga, largura){
+    const codigo = LIGA_PARA_ISO[liga];
+    if (!codigo) return '';
+    return `<img src="https://flagcdn.com/w40/${codigo}.png" alt="" class="bandeira-pais" style="width:${largura || 18}px" onerror="this.style.display='none'">`;
+}
+
+function popularPillsClassificacao(){
+    $('ligaDropdownToggle').innerHTML = `${bandeiraLigaHTML(ligaClassificacaoAtual, 18)}${esc(ligaClassificacaoAtual)} <span>▾</span>`;
+
+    $('ligaDropdownMenu').innerHTML = LIGAS_CLASSIFICACAO.map(l => `
+        <div class="liga-dropdown-item${l === ligaClassificacaoAtual ? ' active' : ''}" data-liga="${esc(l)}">
+            ${bandeiraLigaHTML(l, 18)}${esc(l)}
+        </div>
+    `).join('');
+
+    $('ligaDropdownMenu').querySelectorAll('.liga-dropdown-item').forEach(item => {
+        item.addEventListener('click', () => {
+            ligaClassificacaoAtual = item.dataset.liga;
+            $('ligaDropdownMenu').classList.add('hidden');
+            popularPillsClassificacao();
+            loadClassificacao();
+            renderLeaderboards();
+        });
+    });
+}
+
+function toggleLigaDropdown(){
+    $('ligaDropdownMenu').classList.toggle('hidden');
+}
+
+document.addEventListener('click', e => {
+    const wrap = e.target.closest('.liga-dropdown-wrap');
+    if (!wrap) $('ligaDropdownMenu')?.classList.add('hidden');
+});
+
+function renderLeaderboards(){
+    const d = dashboardData;
+    if (!d) return;
+
+    const nomesPorId = {};
+    d.jogadores.forEach(j => { nomesPorId[j.id] = j.nome; });
+
+    const competicaoAtual = LIGA_PARA_COMPETICAO[ligaClassificacaoAtual];
+    const ligaIdSofascore = LIGA_PARA_ID_SOFASCORE[ligaClassificacaoAtual];
+
+    const estatisticas = d.estatisticas.filter(e => e.competicao === competicaoAtual);
+    const disciplina = d.disciplina.filter(x => x.competicao === competicaoAtual);
+    const sofascore = (d.sofascore || []).filter(s => s.liga_id === ligaIdSofascore);
+
+    const topGolos = [...estatisticas]
+        .filter(e => e.golos)
+        .sort((a, b) => b.golos - a.golos)
+        .slice(0, 6)
+        .map(e => ({label: nomesPorId[e.jogador_id] || 'Desconhecido', value: e.golos, jogadorId: e.jogador_id}));
+    drawBars('topGolosChart', topGolos);
+
+    const topAssist = [...estatisticas]
+        .filter(e => e.assistencias)
+        .sort((a, b) => b.assistencias - a.assistencias)
+        .slice(0, 6)
+        .map(e => ({label: nomesPorId[e.jogador_id] || 'Desconhecido', value: e.assistencias, jogadorId: e.jogador_id}));
+    drawBars('topAssistChart', topAssist);
+
+    const MIN_REMATES_CONVERSAO = 10;
+    const topConversao = [...estatisticas]
+        .filter(e => (e.remates_totais || 0) >= MIN_REMATES_CONVERSAO && (e.golos || 0) <= e.remates_totais)
+        .map(e => ({
+            label: nomesPorId[e.jogador_id] || 'Desconhecido',
+            value: (e.golos || 0) / e.remates_totais * 100,
+            jogadorId: e.jogador_id,
+        }))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 6)
+        .map(e => ({...e, display: e.value.toFixed(1) + '%'}));
+    drawBars('topConversaoChart', topConversao);
+
+    const topAmarelos = [...disciplina]
+        .filter(x => x.cartoes_amarelos)
+        .sort((a, b) => b.cartoes_amarelos - a.cartoes_amarelos)
+        .slice(0, 6)
+        .map(x => ({label: nomesPorId[x.jogador_id] || 'Desconhecido', value: x.cartoes_amarelos, jogadorId: x.jogador_id}));
+    drawBars('topAmarelosChart', topAmarelos);
+
+    const topDefesas = [...estatisticas]
+        .filter(e => e.defesas)
+        .sort((a, b) => b.defesas - a.defesas)
+        .slice(0, 6)
+        .map(e => ({label: nomesPorId[e.jogador_id] || 'Desconhecido', value: e.defesas, jogadorId: e.jogador_id}));
+    drawBars('topDefesasChart', topDefesas);
+
+    const topDesarmes = [...estatisticas]
+        .filter(e => e.desarmes)
+        .sort((a, b) => b.desarmes - a.desarmes)
+        .slice(0, 6)
+        .map(e => ({label: nomesPorId[e.jogador_id] || 'Desconhecido', value: e.desarmes, jogadorId: e.jogador_id}));
+    drawBars('topDesarmesChart', topDesarmes);
+
+    const sofascorePorJogador = {};
+    sofascore.forEach(s => {
+        const acc = sofascorePorJogador[s.jogador_id] || {golos: 0, golos_esperados: 0, assistencias: 0, assistencias_esperadas: 0, alivios: 0};
+        acc.golos += Number(s.golos || 0);
+        acc.golos_esperados += Number(s.golos_esperados || 0);
+        acc.assistencias += Number(s.assistencias || 0);
+        acc.assistencias_esperadas += Number(s.assistencias_esperadas || 0);
+        acc.alivios += Number(s.alivios || 0);
+        sofascorePorJogador[s.jogador_id] = acc;
+    });
+
+    const topXg = Object.entries(sofascorePorJogador)
+        .filter(([, v]) => v.golos_esperados > 0)
+        .map(([id, v]) => ({label: nomesPorId[id] || 'Desconhecido', value: v.golos - v.golos_esperados, jogadorId: Number(id)}))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 6)
+        .map(e => ({...e, display: (e.value >= 0 ? '+' : '') + e.value.toFixed(1)}));
+    drawBars('topXgChart', topXg);
+
+    const topIntercecoes = [...estatisticas]
+        .filter(e => e.intercecoes)
+        .sort((a, b) => b.intercecoes - a.intercecoes)
+        .slice(0, 6)
+        .map(e => ({label: nomesPorId[e.jogador_id] || 'Desconhecido', value: e.intercecoes, jogadorId: e.jogador_id}));
+    drawBars('topIntercecoesChart', topIntercecoes);
+
+    const topCortes = Object.entries(sofascorePorJogador)
+        .filter(([, v]) => v.alivios > 0)
+        .map(([id, v]) => ({label: nomesPorId[id] || 'Desconhecido', value: v.alivios, jogadorId: Number(id)}))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 6);
+    drawBars('topCortesChart', topCortes);
+
+    const topPassesChave = [...estatisticas]
+        .filter(e => e.passes_chave)
+        .sort((a, b) => b.passes_chave - a.passes_chave)
+        .slice(0, 6)
+        .map(e => ({label: nomesPorId[e.jogador_id] || 'Desconhecido', value: e.passes_chave, jogadorId: e.jogador_id}));
+    drawBars('topPassesChaveChart', topPassesChave);
+
+    const MIN_PASSES_PCT = 100;
+    const topPassePct = [...estatisticas]
+        .filter(e => (e.passes_totais || 0) >= MIN_PASSES_PCT && e.passes_certos_pct !== null && e.passes_certos_pct !== undefined)
+        .map(e => ({label: nomesPorId[e.jogador_id] || 'Desconhecido', value: Number(e.passes_certos_pct), jogadorId: e.jogador_id}))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 6)
+        .map(e => ({...e, display: e.value.toFixed(1) + '%'}));
+    drawBars('topPassePctChart', topPassePct);
+
+    const jogadorIdsDaLiga = new Set(estatisticas.map(e => e.jogador_id));
+
+    const topXa = Object.entries(sofascorePorJogador)
+        .filter(([, v]) => v.assistencias_esperadas > 0)
+        .map(([id, v]) => ({label: nomesPorId[id] || 'Desconhecido', value: v.assistencias - v.assistencias_esperadas, jogadorId: Number(id)}))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 6)
+        .map(e => ({...e, display: (e.value >= 0 ? '+' : '') + e.value.toFixed(1)}));
+    drawBars('topXaChart', topXa);
+
+    const MIN_MINUTOS_DEFESA = 300;
+    const topAcoesDefensivas = estatisticas
+        .filter(e => (e.minutos || 0) >= MIN_MINUTOS_DEFESA)
+        .map(e => {
+            const alivios = (sofascorePorJogador[e.jogador_id] || {}).alivios || 0;
+            const acoes = (e.desarmes || 0) + (e.intercecoes || 0) + alivios;
+            return {label: nomesPorId[e.jogador_id] || 'Desconhecido', value: acoes / e.minutos * 90, jogadorId: e.jogador_id};
+        })
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 6)
+        .map(e => ({...e, display: e.value.toFixed(2)}));
+    drawBars('topAcoesDefensivasChart', topAcoesDefensivas);
+
+    const EPOCA_INICIO = '2024-07-01', EPOCA_FIM = '2025-06-30';
+    const valorAtualPorJogador = {};
+    (d.valores_mercado || []).forEach(v => {
+        if (!jogadorIdsDaLiga.has(v.jogador_id)) return;
+        valorAtualPorJogador[v.jogador_id] = v.valor;
+    });
+    const valorInfoPorJogador = {};
+    (d.valores_mercado || []).forEach(v => {
+        if (!jogadorIdsDaLiga.has(v.jogador_id)) return;
+        if (v.data < EPOCA_INICIO || v.data > EPOCA_FIM) return;
+        const acc = valorInfoPorJogador[v.jogador_id] || {primeiro: null, pico: 0};
+        if (acc.primeiro === null) acc.primeiro = v.valor;
+        acc.pico = Math.max(acc.pico, v.valor);
+        valorInfoPorJogador[v.jogador_id] = acc;
+    });
+
+    const topValorizacao = Object.entries(valorInfoPorJogador)
+        .filter(([, v]) => v.primeiro > 0 && v.pico > v.primeiro)
+        .map(([id, v]) => ({label: nomesPorId[id] || 'Desconhecido', value: (v.pico - v.primeiro) / v.primeiro * 100, jogadorId: Number(id)}))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 6)
+        .map(e => ({...e, display: '+' + e.value.toFixed(0) + '%'}));
+    drawBars('topValorizacaoChart', topValorizacao);
+
+    const MIN_CONTRIB_CUSTO = 3;
+    const MIN_VALOR_CUSTO = 100_000;
+    const topCustoBeneficio = estatisticas
+        .map(e => {
+            const contrib = (e.golos || 0) + (e.assistencias || 0);
+            const valor = valorAtualPorJogador[e.jogador_id];
+            if (contrib < MIN_CONTRIB_CUSTO || !valor || valor < MIN_VALOR_CUSTO) return null;
+            return {label: nomesPorId[e.jogador_id] || 'Desconhecido', value: contrib / (valor / 1_000_000), jogadorId: e.jogador_id};
+        })
+        .filter(Boolean)
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 6)
+        .map(e => ({...e, display: e.value.toFixed(2) + ' G+A/M€'}));
+    drawBars('topCustoBeneficioChart', topCustoBeneficio);
+
+    const DIAS_EPOCA = 300;
+    const diasLesaoPorJogador = {};
+    (d.lesoes || []).forEach(l => {
+        if (!jogadorIdsDaLiga.has(l.jogador_id)) return;
+        if (l.epoca !== '24/25') return;
+        diasLesaoPorJogador[l.jogador_id] = (diasLesaoPorJogador[l.jogador_id] || 0) + (l.dias_indisponivel || 0);
+    });
+    const topRiscoLesao = Object.entries(diasLesaoPorJogador)
+        .map(([id, dias]) => ({label: nomesPorId[id] || 'Desconhecido', value: Math.min(100, dias / DIAS_EPOCA * 100), jogadorId: Number(id), dias}))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 6)
+        .map(e => ({...e, display: e.value.toFixed(0) + '% (' + Math.min(e.dias, DIAS_EPOCA) + 'd)'}));
+    drawBars('topRiscoLesaoChart', topRiscoLesao);
+}
+
+async function loadDashboard(){
+    const d = await api('/api/dashboard');
+    dashboardData = d;
+    $('metricPlayers').textContent = d.jogadores.length;
+    $('metricClubs').textContent = d.clubes.length;
+
+    const yellow = d.disciplina.reduce((s, x) => s + Number(x.cartoes_amarelos || 0), 0);
+    const red = d.disciplina.reduce((s, x) => s + Number(x.cartoes_vermelhos || 0), 0);
+    $('metricYellow').textContent = yellow;
+    $('metricRed').textContent = red;
+
+    popularPillsClassificacao();
+    renderLeaderboards();
+    await loadClassificacao();
+}
+
+/* ============================================================
+   JOGADORES — SCOUT TERMINAL
+============================================================ */
+let epocaAtual = '';
+let jogadoresCache = [];
+let filtroLiga = '';
+let filtroClube = '';
+let filtroPosicao = new Set();
+let filtroIdadeMin = null;
+let filtroIdadeMax = null;
+let filtroAlturaMin = null;
+let filtroAlturaMax = null;
+let filtroPe = '';
+let filtroPosSecundaria = new Set();
+let filtroContratoSel = '';
+let filtroJogosMin = 0;
+let filtroRatingMin = null;
+let filtroRatingMax = null;
+let filtroGolosPor90Min = null;
+let filtroXgEficaciaMin = null;
+let filtroXgEficaciaMax = null;
+let filtroValorMercadoMin = null;
+let filtroValorMercadoMax = null;
+let filtroEmprestados = false;
+let filtroTaca = false;
+let filtroNacionalidade = new Set();
+let openRowId = null;
+let similaresCache = {};
+let similaresAbertosIds = new Set();
+
+function toggleSimilares(jogadorId, aoRenderizar){
+    if (similaresAbertosIds.has(jogadorId)){
+        similaresAbertosIds.delete(jogadorId);
+    } else {
+        similaresAbertosIds.add(jogadorId);
+        carregarSimilares(jogadorId, aoRenderizar);
+    }
+    aoRenderizar();
+}
+
+/* ---------- seleção para comparação ---------- */
+const MAX_COMPARAR = 4;
+let compararSelecionados = [];
+
+function estaSelecionadoComparar(jogadorId){
+    return compararSelecionados.some(x => x.id === jogadorId);
+}
+
+function toggleComparar(jogadorId, nome){
+    const idx = compararSelecionados.findIndex(x => x.id === jogadorId);
+    if (idx >= 0){
+        compararSelecionados.splice(idx, 1);
+    } else {
+        if (compararSelecionados.length >= MAX_COMPARAR){
+            alert(`Só podes comparar até ${MAX_COMPARAR} jogadores de cada vez.`);
+            return;
+        }
+        compararSelecionados.push({id: jogadorId, nome});
+    }
+    atualizarBarraComparacao();
+    document.querySelectorAll(`.comparar-toggle[data-id="${jogadorId}"]`).forEach(btn => {
+        btn.classList.toggle('active', estaSelecionadoComparar(jogadorId));
+    });
+}
+
+function limparComparacao(){
+    compararSelecionados = [];
+    atualizarBarraComparacao();
+    document.querySelectorAll('.comparar-toggle.active').forEach(btn => btn.classList.remove('active'));
+}
+
+function atualizarBarraComparacao(){
+    const barra = $('barraComparacao');
+    if (!compararSelecionados.length){
+        barra.classList.add('hidden');
+        return;
+    }
+    barra.classList.remove('hidden');
+    $('barraComparacaoTexto').textContent = compararSelecionados.length === 1
+        ? `${compararSelecionados[0].nome} selecionado`
+        : `${compararSelecionados.length} jogadores selecionados`;
+}
+
+function abrirComparacao(){
+    if (compararSelecionados.length < 2){
+        alert('Escolhe pelo menos 2 jogadores para comparar.');
+        return;
+    }
+    const ids = compararSelecionados.map(x => x.id).join(',');
+    const url = new URL(location.href);
+    url.searchParams.set('comparar', ids);
+    url.searchParams.delete('jogador');
+    url.searchParams.delete('clube');
+    history.pushState({}, '', url);
+    mostrarPagina('comparar');
+    carregarComparacao(ids);
+}
+
+const POSICAO_LABEL = {Goalkeeper: 'GR', Defender: 'DEF', Midfielder: 'MED', Forward: 'AV'};
+
+function semAcentos(str){
+    return String(str || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+}
+
+async function loadSeasons(){
+    const epocas = await api('/api/epocas');
+    if (!epocas.length){
+        $('seasonPills').innerHTML = '<span class="empty">Sem épocas na base de dados.</span>';
+        return;
+    }
+    epocaAtual = epocas[0];
+    $('seasonPills').innerHTML = epocas.map(e =>
+        `<button class="pill${e === epocaAtual ? ' active' : ''}" data-epoca="${esc(e)}">${esc(e)}</button>`
+    ).join('');
+    $('seasonPills').querySelectorAll('.pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+            $('seasonPills').querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            epocaAtual = btn.dataset.epoca;
+            loadPlayers();
+        });
+    });
+}
+
+function idade(dataNascimento){
+    if (!dataNascimento) return null;
+    const nasc = new Date(dataNascimento);
+    if (isNaN(nasc)) return null;
+    const hoje = new Date();
+    let anos = hoje.getFullYear() - nasc.getFullYear();
+    const aindaNaoFezAnos = (hoje.getMonth() < nasc.getMonth()) ||
+        (hoje.getMonth() === nasc.getMonth() && hoje.getDate() < nasc.getDate());
+    if (aindaNaoFezAnos) anos--;
+    return anos;
+}
+
+function anosContratoRestantes(dataContrato){
+    if (!dataContrato) return null;
+    const fim = new Date(dataContrato);
+    if (isNaN(fim)) return null;
+    const hoje = new Date();
+    const dias = (fim - hoje) / (1000 * 60 * 60 * 24);
+    return dias / 365;
+}
+
+function scoreColor(score){
+    if (score >= 80) return 'var(--accent2)';
+    if (score >= 60) return 'var(--accent)';
+    if (score >= 40) return 'var(--yellow)';
+    return 'var(--red)';
+}
+
+function scoreRingHTML(score, extraClass){
+    extraClass = extraClass || '';
+    if (score === null || score === undefined){
+        return `<div class="score-ring ${extraClass}" style="--score:0;--ring-color:var(--muted)" title="Amostra insuficiente (menos de 10 jogos completos) para um score fiável"><span>—</span></div>`;
+    }
+    return `<div class="score-ring ${extraClass}" style="--score:${score};--ring-color:${scoreColor(score)}"><span>${score}</span></div>`;
+}
+
+function formatarData(d){
+    if (!d) return '—';
+    const dt = new Date(d);
+    return isNaN(dt) ? '—' : dt.toLocaleDateString('pt-PT');
+}
+
+function pctStr(a, b, casas){
+    if (!b) return '—';
+    return ((a || 0) / b * 100).toFixed(casas ?? 0) + '%';
+}
+
+function per90Str(valor, minutos){
+    if (!minutos || valor === null || valor === undefined) return '—';
+    return (valor / minutos * 90).toFixed(2);
+}
+
+function num(v){ return (v === null || v === undefined) ? '—' : v; }
+
+function statSections(p){
+    const pc = p.percentis_chip || {};
+    const secoes = [];
+
+    if (p.posicao_api === 'Goalkeeper'){
+        secoes.push({
+            titulo: 'Baliza',
+            linhas: [
+                ['Golos sofridos', num(p.golos_sofridos)],
+                ['Defesas', num(p.defesas)],
+                ['% Remates Salvos', pctStr(p.defesas, (p.defesas || 0) + (p.golos_sofridos || 0), 1), pc.pct_remates_salvos],
+                ['Penáltis defendidos', num(p.penaltis_defendidos ?? 0)],
+            ],
+        });
+    }
+
+    secoes.push({
+        titulo: 'Ataque',
+        linhas: [
+            ['Golos', num(p.golos ?? 0)],
+            ['Assistências', num(p.assistencias ?? 0)],
+            ['Remates totais', num(p.remates_totais)],
+            ['Remates à baliza', num(p.remates_a_baliza)],
+            ['Golos/90', per90Str(p.golos, p.minutos), pc.golos_90],
+            ['Assist./90', per90Str(p.assistencias, p.minutos), pc.assist_90],
+            ['Penáltis marcados', num(p.penaltis_marcados)],
+            ['Penáltis falhados', num(p.penaltis_falhados)],
+        ],
+    });
+
+    secoes.push({
+        titulo: 'Duelos',
+        linhas: [
+            ['Duelos totais', num(p.duelos_totais)],
+            ['Duelos ganhos', num(p.duelos_ganhos)],
+            ['% Duelos Ganhos', pctStr(p.duelos_ganhos, p.duelos_totais, 1), pc.pct_duelos],
+            ['Dribles tentados', num(p.dribles_tentados)],
+            ['Dribles conseguidos', num(p.dribles_conseguidos)],
+            ['% Dribles Conseguidos', pctStr(p.dribles_conseguidos, p.dribles_tentados, 1), pc.pct_dribles],
+        ],
+    });
+
+    secoes.push({
+        titulo: 'Defesa / Disciplina',
+        linhas: [
+            ['Desarmes', num(p.desarmes)],
+            ['Interceções', num(p.intercecoes)],
+            ['Bloqueios', num(p.bloqueios)],
+            ['Titularidades', num(p.titularidades)],
+            ['Cartões amarelos', num(p.cartoes_amarelos ?? 0)],
+            ['Cartões vermelhos', num(p.cartoes_vermelhos ?? 0)],
+        ],
+    });
+
+    return secoes;
+}
+
+/* ---------- radar SVG (perfil normalizado por posição) ---------- */
+function formatarValorRadar(v){
+    if (v === null || v === undefined) return '—';
+    const n = Number(v);
+    if (!isFinite(n)) return '—';
+    return Math.round(n * 100) / 100;
+}
+
+function avisoPercentilHTML(p){
+    if (p.amostra_suficiente === false){
+        return '<div class="amostra-aviso">⚠ Amostra insuficiente (menos de 10 jogos completos) — percentis não fiáveis</div>';
+    }
+    if (p.pool_suficiente === false){
+        return `<div class="amostra-aviso">⚠ Grupo de comparação pequeno (${p.pool_tamanho} jogadores qualificados nesta posição/liga) — percentis pouco fiáveis</div>`;
+    }
+    return '';
+}
+
+function radarSelecionar(uid, indice){
+    document.querySelectorAll(`.radar-item[data-uid="${uid}"]`).forEach((el, i) => {
+        el.classList.toggle('active', i === indice);
+    });
+    document.querySelectorAll(`circle[data-uid="${uid}"][data-dot]`).forEach((el, i) => {
+        el.setAttribute('r', i === indice ? 5 : 3);
+    });
+}
+
+function drawRadarParts(radar, competicao){
+    const size = 230, cx = size / 2, cy = size / 2, r = 78;
+    const n = radar.length;
+    const uid = 'r' + Math.random().toString(36).slice(2, 9);
+    const angulo = i => -Math.PI / 2 + i * (2 * Math.PI / n);
+    const ponto = (i, raio) => [cx + raio * Math.cos(angulo(i)), cy + raio * Math.sin(angulo(i))];
+
+    const aneis = [20, 40, 60, 80, 100].map(pct => {
+        const pts = radar.map((_, i) => ponto(i, r * pct / 100).join(',')).join(' ');
+        return `<polygon points="${pts}" fill="none" stroke="#28313E" stroke-width="1"/>`;
+    }).join('');
+
+    const eixos = radar.map((_, i) => {
+        const [x, y] = ponto(i, r);
+        return `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#28313E" stroke-width="1"/>`;
+    }).join('');
+
+    const mediaPts = radar.map((_, i) => ponto(i, r * 0.5).join(',')).join(' ');
+    const jogadorPts = radar.map((eixo, i) => ponto(i, r * (eixo.percentil || 0) / 100).join(',')).join(' ');
+
+    const labels = radar.map((eixo, i) => {
+        const [x, y] = ponto(i, r + 26);
+        let anchor = 'middle';
+        if (x < cx - 5) anchor = 'end';
+        else if (x > cx + 5) anchor = 'start';
+        return `<text x="${x}" y="${y}" fill="var(--muted)" font-family="var(--font-mono)" font-size="10" text-anchor="${anchor}" dominant-baseline="middle">${esc(eixo.eixo)}</text>`;
+    }).join('');
+
+    const verticesMedia = radar.map((eixo, i) => {
+        const [x, y] = ponto(i, r * 0.5);
+        return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="9" fill="transparent" data-tooltip="${esc(eixo.eixo)}: percentil 50 (média da posição)"/>`;
+    }).join('');
+
+    const verticesJogador = radar.map((eixo, i) => {
+        const [x, y] = ponto(i, r * (eixo.percentil || 0) / 100);
+        const tip = `${esc(eixo.eixo)}: ${esc(formatarValorRadar(eixo.valor))} · percentil ${Math.round(eixo.percentil || 0)}`;
+        return `
+            <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="10" fill="transparent" style="cursor:pointer" data-tooltip="${tip}" onclick="event.stopPropagation(); radarSelecionar('${uid}', ${i})"/>
+            <circle data-uid="${uid}" data-dot cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="var(--accent)" pointer-events="none"/>
+        `;
+    }).join('');
+
+    const listaItens = radar.map((eixo, i) => {
+        const cor = percentilCor(eixo.percentil) || 'var(--text)';
+        return `
+            <div class="radar-item" data-uid="${uid}" onclick="event.stopPropagation(); radarSelecionar('${uid}', ${i})" style="--cor-percentil:${cor}">
+                <div class="radar-item-label">${esc(eixo.eixo)}</div>
+                <div class="radar-item-valor">${esc(formatarValorRadar(eixo.valor))}</div>
+                <div class="radar-item-percentil">percentil ${Math.round(eixo.percentil || 0)}${competicao ? ' na ' + esc(competicao) : ''}</div>
+            </div>
+        `;
+    }).join('');
+
+    const svg = `
+        <svg viewBox="0 0 ${size} ${size}" width="100%" height="240">
+            ${aneis}
+            ${eixos}
+            <polygon points="${mediaPts}" fill="none" stroke="var(--muted)" stroke-width="1.2" stroke-dasharray="4,4"/>
+            <polygon points="${jogadorPts}" fill="rgba(240,167,48,.25)" stroke="var(--accent)" stroke-width="2"/>
+            ${labels}
+            ${verticesMedia}
+            ${verticesJogador}
+        </svg>
+    `;
+
+    const legend = `
+        <div class="radar-legend">
+            <span class="radar-legend-item"><span class="radar-swatch radar-swatch-jogador"></span>Jogador</span>
+            <span class="radar-legend-item"><span class="radar-swatch radar-swatch-media"></span>Média da posição</span>
+        </div>
+    `;
+
+    return { svg, legend, lista: `<div class="radar-lista">${listaItens}</div>` };
+}
+
+/* ---------- radar "combinado" (svg+lista lado a lado, legenda por baixo) -- usado no perfil completo ---------- */
+function drawRadar(radar, competicao){
+    const { svg, legend, lista } = drawRadarParts(radar, competicao);
+    return `
+        <div class="radar-wrap">${svg}${lista}</div>
+        ${legend}
+    `;
+}
+
+/* ---------- radar sobreposto (vários jogadores no mesmo gráfico) -- usado na comparação ----------
+   Só sobrepõe jogadores com os MESMOS eixos (ou seja, mesmo grupo posicional) -- eixos diferentes
+   (ex: Guarda-Redes vs Avançado) não são comparáveis no mesmo gráfico, por isso agrupam-se por
+   assinatura de eixos e cada grupo ganha o seu próprio radar. */
+const CORES_COMPARACAO = ['#F0A730', '#39C98C', '#60A5FA', '#FF6E5C'];
+
+function drawRadarOverlay(jogadores){
+    const validos = jogadores.filter(p => p.radar && p.radar.length);
+    if (!validos.length) return '<p class="empty">Sem dados de radar para estes jogadores.</p>';
+
+    const grupos = [];
+    for (const p of validos){
+        const assinatura = p.radar.map(e => e.eixo).join('|');
+        let grupo = grupos.find(g => g.assinatura === assinatura);
+        if (!grupo){
+            grupo = { assinatura, eixosBase: p.radar.map(e => e.eixo), jogadores: [] };
+            grupos.push(grupo);
+        }
+        grupo.jogadores.push(p);
+    }
+
+    return grupos.map(grupo => desenharGrupoRadarOverlay(grupo.eixosBase, grupo.jogadores, validos)).join('');
+}
+
+function desenharGrupoRadarOverlay(eixosBase, jogadoresGrupo, todosJogadores){
+    const size = 260, cx = size / 2, cy = size / 2, r = 90;
+    const n = eixosBase.length;
+    const angulo = i => -Math.PI / 2 + i * (2 * Math.PI / n);
+    const ponto = (i, raio) => [cx + raio * Math.cos(angulo(i)), cy + raio * Math.sin(angulo(i))];
+    const corDe = p => CORES_COMPARACAO[todosJogadores.indexOf(p) % CORES_COMPARACAO.length];
+
+    const aneis = [20, 40, 60, 80, 100].map(pct => {
+        const pts = eixosBase.map((_, i) => ponto(i, r * pct / 100).join(',')).join(' ');
+        return `<polygon points="${pts}" fill="none" stroke="#28313E" stroke-width="1"/>`;
+    }).join('');
+
+    const eixosLinhas = eixosBase.map((_, i) => {
+        const [x, y] = ponto(i, r);
+        return `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#28313E" stroke-width="1"/>`;
+    }).join('');
+
+    const labels = eixosBase.map((label, i) => {
+        const [x, y] = ponto(i, r + 28);
+        let anchor = 'middle';
+        if (x < cx - 5) anchor = 'end';
+        else if (x > cx + 5) anchor = 'start';
+        return `<text x="${x}" y="${y}" fill="var(--muted)" font-family="var(--font-mono)" font-size="10" text-anchor="${anchor}" dominant-baseline="middle">${esc(label)}</text>`;
+    }).join('');
+
+    const mediaPts = eixosBase.map((_, i) => ponto(i, r * 0.5).join(',')).join(' ');
+
+    const poligonos = jogadoresGrupo.map(p => {
+        const cor = corDe(p);
+        const pts = p.radar.map((eixo, i) => ponto(i, r * (eixo.percentil || 0) / 100).join(',')).join(' ');
+        return `<polygon points="${pts}" fill="${cor}22" stroke="${cor}" stroke-width="2"/>`;
+    }).join('');
+
+    const vertices = jogadoresGrupo.map(p => {
+        const cor = corDe(p);
+        return p.radar.map((eixo, i) => {
+            const [x, y] = ponto(i, r * (eixo.percentil || 0) / 100);
+            const tip = `${esc(p.nome)} — ${esc(eixo.eixo)}: ${esc(formatarValorRadar(eixo.valor))} · percentil ${Math.round(eixo.percentil || 0)}`;
+            return `
+                <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="8" fill="transparent" data-tooltip="${tip}"/>
+                <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="${cor}" pointer-events="none"/>
+            `;
+        }).join('');
+    }).join('');
+
+    const legenda = jogadoresGrupo.map(p => {
+        const cor = corDe(p);
+        return `<span class="radar-legend-item"><span class="radar-swatch" style="border-top:3px solid ${cor};border-radius:2px"></span>${esc(p.nome)}</span>`;
+    }).join('');
+
+    const listaJogador = p => {
+        const cor = corDe(p);
+        const itens = p.radar.map(eixo => {
+            const corPct = percentilCor(eixo.percentil) || 'var(--text)';
+            return `
+                <div class="radar-item" style="--cor-percentil:${corPct}">
+                    <div class="radar-item-label">${esc(eixo.eixo)}</div>
+                    <div class="radar-item-valor">${esc(formatarValorRadar(eixo.valor))}</div>
+                    <div class="radar-item-percentil">percentil ${Math.round(eixo.percentil || 0)}${p.competicao ? ' na ' + esc(p.competicao) : ''}</div>
+                </div>
+            `;
+        }).join('');
+        return `
+            <div>
+                <div class="radar-lista-titulo" style="color:${cor}">${esc(p.nome)}</div>
+                <div class="radar-lista">${itens}</div>
+            </div>
+        `;
+    };
+
+    const svg = `
+        <svg viewBox="0 0 ${size} ${size}" width="100%" height="280" style="max-width:340px">
+            ${aneis}
+            ${eixosLinhas}
+            <polygon points="${mediaPts}" fill="none" stroke="var(--muted)" stroke-width="1.2" stroke-dasharray="4,4"/>
+            ${labels}
+            ${poligonos}
+            ${vertices}
+        </svg>
+        <div class="radar-legend">
+            ${legenda}
+            <span class="radar-legend-item"><span class="radar-swatch radar-swatch-media"></span>Média da posição</span>
+        </div>
+    `;
+
+    return `
+        <div class="comparar-radar-grupo">
+            ${listaJogador(jogadoresGrupo[0])}
+            <div class="radar-centro">${svg}</div>
+            <div class="comparar-radar-direita">${jogadoresGrupo.slice(1).map(listaJogador).join('')}</div>
+        </div>
+    `;
+}
+
+/* ---------- gráfico de evolução do valor de mercado ---------- */
+function drawValorMercadoChart(pontos){
+    const validos = pontos.filter(p => p.valor !== null && p.valor !== undefined);
+    if (!validos.length){
+        return '<div class="mv-loading">Sem histórico de valor de mercado.</div>';
+    }
+
+    const w = 600, h = 200, padL = 46, padR = 10, padT = 14, padB = 22;
+    const innerW = w - padL - padR, innerH = h - padT - padB;
+
+    const datas = validos.map(p => new Date(p.data).getTime());
+    const valores = validos.map(p => p.valor);
+    const minData = Math.min(...datas), maxData = Math.max(...datas);
+    const maxValor = Math.max(...valores, 1);
+
+    const x = t => padL + (maxData === minData ? 0 : (t - minData) / (maxData - minData) * innerW);
+    const y = v => padT + innerH - (v / maxValor * innerH);
+
+    const linhaPts = validos.map(p => `${x(new Date(p.data).getTime()).toFixed(1)},${y(p.valor).toFixed(1)}`).join(' ');
+    const areaPts = `${padL},${padT + innerH} ${linhaPts} ${x(maxData).toFixed(1)},${padT + innerH}`;
+
+    const picoIdx = valores.indexOf(Math.max(...valores));
+    const pico = validos[picoIdx];
+    const picoX = x(new Date(pico.data).getTime()), picoY = y(pico.valor);
+
+    const gridlines = [0.25, 0.5, 0.75, 1].map(f => {
+        const yy = padT + innerH - innerH * f;
+        return `<line x1="${padL}" y1="${yy.toFixed(1)}" x2="${w - padR}" y2="${yy.toFixed(1)}" stroke="#28313E" stroke-width="1"/>
+                <text x="${padL - 6}" y="${(yy + 3).toFixed(1)}" fill="var(--muted)" font-family="var(--font-mono)" font-size="9" text-anchor="end">${formatarValorCompacto(maxValor * f)}</text>`;
+    }).join('');
+
+    const anoInicio = new Date(minData).getFullYear(), anoFim = new Date(maxData).getFullYear();
+
+    return `
+        <svg viewBox="0 0 ${w} ${h}" width="100%" height="200">
+            ${gridlines}
+            <polygon points="${areaPts}" fill="rgba(240,167,48,.15)"/>
+            <polyline points="${linhaPts}" fill="none" stroke="var(--accent)" stroke-width="2"/>
+            <circle cx="${picoX.toFixed(1)}" cy="${picoY.toFixed(1)}" r="3.5" fill="var(--accent2)"/>
+            <text x="${picoX.toFixed(1)}" y="${(picoY - 8).toFixed(1)}" fill="var(--accent2)" font-family="var(--font-mono)" font-size="9" text-anchor="middle">Máx: ${formatarValorCompacto(pico.valor)}</text>
+            <text x="${padL}" y="${h - 6}" fill="var(--muted)" font-family="var(--font-mono)" font-size="9">${anoInicio}</text>
+            <text x="${w - padR}" y="${h - 6}" fill="var(--muted)" font-family="var(--font-mono)" font-size="9" text-anchor="end">${anoFim}</text>
+        </svg>
+    `;
+}
+
+function formatarValorCompacto(v){
+    if (v >= 1_000_000) return '€' + (v / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+    if (v >= 1_000) return '€' + (v / 1_000).toFixed(0) + 'k';
+    return '€' + v;
+}
+
+function formatarValorMoeda(v, simbolo){
+    const s = simbolo || '€';
+    if (v >= 1_000_000) return s + (v / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+    if (v >= 1_000) return s + (v / 1_000).toFixed(0) + 'k';
+    return s + v;
+}
+
+/* ---------- heatmap (pontos de toque, via Sofascore) ---------- */
+function drawHeatmap(pontos){
+    if (!pontos || !pontos.length){
+        return '<div class="mv-loading">Sem dados de heatmap.</div>';
+    }
+    // Campo "de pé" (retrato) em vez de deitado, para condizer com o
+    // mapa de "Posição detalhada" ao lado e preencher a altura da
+    // coluna toda -- ataque aponta para cima (eixo do avanço vira
+    // vertical, eixo esquerda/direita vira horizontal).
+    const largura = 250, altura = 380, topo = 30, h = altura + topo;
+    const pa = 40, ga = 15, raioCanto = 6;
+
+    const campo = `
+        <rect x="0" y="${topo}" width="${largura}" height="${altura}" rx="10" ry="10" fill="#16321f"/>
+        <g fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.2">
+            <rect x="1" y="${topo+1}" width="${largura-2}" height="${altura-2}" rx="9" ry="9"/>
+            <line x1="0" y1="${topo+altura/2}" x2="${largura}" y2="${topo+altura/2}"/>
+            <circle cx="${largura/2}" cy="${topo+altura/2}" r="34"/>
+            <rect x="${largura/2-55}" y="${topo}" width="110" height="${pa}"/>
+            <rect x="${largura/2-55}" y="${topo+altura-pa}" width="110" height="${pa}"/>
+            <rect x="${largura/2-26}" y="${topo}" width="52" height="${ga}"/>
+            <rect x="${largura/2-26}" y="${topo+altura-ga}" width="52" height="${ga}"/>
+            <path d="M ${largura/2-16} ${topo+pa} A 20 20 0 0 0 ${largura/2+16} ${topo+pa}"/>
+            <path d="M ${largura/2-16} ${topo+altura-pa} A 20 20 0 0 1 ${largura/2+16} ${topo+altura-pa}"/>
+            <path d="M 0 ${topo+raioCanto} A ${raioCanto} ${raioCanto} 0 0 0 ${raioCanto} ${topo}"/>
+            <path d="M ${largura-raioCanto} ${topo} A ${raioCanto} ${raioCanto} 0 0 0 ${largura} ${topo+raioCanto}"/>
+            <path d="M 0 ${topo+altura-raioCanto} A ${raioCanto} ${raioCanto} 0 0 1 ${raioCanto} ${topo+altura}"/>
+            <path d="M ${largura-raioCanto} ${topo+altura} A ${raioCanto} ${raioCanto} 0 0 1 ${largura} ${topo+altura-raioCanto}"/>
+        </g>
+        <circle cx="${largura/2}" cy="${topo+altura/2}" r="1.6" fill="rgba(255,255,255,.35)"/>
+        <circle cx="${largura/2}" cy="${topo+pa-24}" r="1.6" fill="rgba(255,255,255,.35)"/>
+        <circle cx="${largura/2}" cy="${topo+altura-pa+24}" r="1.6" fill="rgba(255,255,255,.35)"/>
+    `;
+
+    const maxCount = Math.max(...pontos.map(p => p.count || 1));
+    const pontosSvg = pontos.map(p => {
+        // Invertido: no Sofascore, jogadores do lado direito (ex:
+        // Extremo Direito) têm y baixo, e do lado esquerdo têm y alto
+        // -- confirmado com a média real de ~171 extremos direitos
+        // (y≈40) vs ~181 extremos esquerdos (y≈60) na nossa BD. Com o
+        // ataque a apontar para cima, o lado direito do jogador fica
+        // à direita do ecrã, por isso p.y baixo -> x grande.
+        const x = ((100 - p.y) / 100) * largura;
+        const y = topo + ((100 - p.x) / 100) * altura;
+        const intensidade = Math.min(1, (p.count || 1) / maxCount);
+        return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="16" fill="#fff" fill-opacity="${(0.12 + intensidade * 0.5).toFixed(2)}"/>`;
+    }).join('');
+
+    const uid = Math.random().toString(36).slice(2);
+    const idFiltro = `heatColorize-${uid}`;
+    const idClip = `clipCampo-${uid}`;
+
+    return `
+        <svg viewBox="0 0 ${largura} ${h}" width="100%" height="100%" style="max-width:220px;display:block;margin:0 auto">
+            <defs>
+                <filter id="${idFiltro}" x="-30%" y="-30%" width="160%" height="160%">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="9" result="blur"/>
+                    <feColorMatrix in="blur" type="matrix"
+                        values="0 0 0 1 0  0 0 0 1 0  0 0 0 1 0  0 0 0 1 0" result="grey"/>
+                    <feComponentTransfer in="grey" result="calor">
+                        <feFuncR type="table" tableValues="0.15 0.47 0.90 0.94 0.86"/>
+                        <feFuncG type="table" tableValues="0.35 0.78 0.86 0.55 0.16"/>
+                        <feFuncB type="table" tableValues="0.15 0.31 0.24 0.16 0.12"/>
+                        <feFuncA type="table" tableValues="0 0.25 0.55 0.78 0.95"/>
+                    </feComponentTransfer>
+                </filter>
+                <clipPath id="${idClip}">
+                    <rect x="1" y="${topo+1}" width="${largura-2}" height="${altura-2}" rx="9" ry="9"/>
+                </clipPath>
+            </defs>
+            ${campo}
+            <g filter="url(#${idFiltro})" clip-path="url(#${idClip})">
+                ${pontosSvg}
+            </g>
+        </svg>
+    `;
+}
+
+/* ---------- estatísticas avançadas (Sofascore) ---------- */
+function pctv(v){ return (v === null || v === undefined) ? '—' : v + '%'; }
+
+function sofascoreSections(s, posicaoApi, pc){
+    if (!s) return [];
+    pc = pc || {};
+    const secoes = [];
+
+    if (posicaoApi === 'Goalkeeper'){
+        secoes.push({
+            titulo: 'Guarda-Redes (Sofascore)',
+            linhas: [
+                ['Golos evitados', num(s.golos_evitados)],
+                ['Balizas a zero', num(s.balizas_a_zero)],
+                ['Remates defendidos (dentro da área)', num(s.remates_defendidos_dentro_area)],
+                ['Remates defendidos (fora da área)', num(s.remates_defendidos_fora_area)],
+                ['Defesas agarradas', num(s.defesas_agarradas)],
+                ['Defesas desviadas', num(s.defesas_desviadas)],
+                ['Socos', num(s.socos)],
+                ['Saídas aéreas', num(s.saidas_aereas)],
+                ['Saídas bem sucedidas', num(s.saidas_bem_sucedidas)],
+                ['Saídas totais', num(s.saidas_totais)],
+                ['Cruzamentos não agarrados', num(s.cruzamentos_nao_agarrados)],
+                ['Pontapés de baliza', num(s.pontapes_de_baliza)],
+                ['Golos sofridos (dentro da área)', num(s.golos_sofridos_dentro_area)],
+                ['Golos sofridos (fora da área)', num(s.golos_sofridos_fora_area)],
+                ['Penáltis sofridos', num(s.penaltis_sofridos)],
+            ],
+        });
+    }
+
+    secoes.push({
+        titulo: 'Finalização',
+        linhas: [
+            ['Golos esperados (xG)', num(s.golos_esperados)],
+            ['Assistências esperadas (xA)', num(s.assistencias_esperadas)],
+            ['xG + xA', num(s.xg_envolvimento)],
+            ['Grandes ocasiões criadas', num(s.grandes_ocasioes_criadas)],
+            ['Grandes ocasiões falhadas', num(s.grandes_ocasioes_falhadas)],
+            ['Golos de cabeça', num(s.golos_cabeca)],
+            ['Golos com o pé direito', num(s.golos_pe_direito)],
+            ['Golos com o pé esquerdo', num(s.golos_pe_esquerdo)],
+            ['Golos de livre direto', num(s.golos_livre_direto)],
+            ['Golos dentro da área', num(s.golos_dentro_area)],
+            ['Golos fora da área', num(s.golos_fora_area)],
+            ['Golos + assistências', num(s.golos_mais_assistencias)],
+            ['% Conversão de remates', pctv(s.conversao_remates_pct)],
+            ['Remates dentro da área', num(s.remates_dentro_area)],
+            ['Remates fora da área', num(s.remates_fora_area)],
+            ['Remates para fora', num(s.remates_fora)],
+            ['Remates ao poste', num(s.remates_ao_poste)],
+            ['Remates bloqueados', num(s.remates_bloqueados)],
+            ['Autogolos', num(s.autogolos)],
+        ],
+    });
+
+    secoes.push({
+        titulo: 'Passe',
+        linhas: [
+            ['Passes certos', num(s.passes_certos)],
+            ['Passes errados', num(s.passes_errados)],
+            ['% Passe certo', pctv(s.passes_certos_pct), pc.pct_passes],
+            ['Passes-chave', num(s.passes_chave)],
+            ['Passes pré-assistência', num(s.passes_pre_assistencia)],
+            ['Assistências tentadas', num(s.assistencias_tentadas)],
+            ['Passes picados certos', num(s.passes_picados_certos)],
+            ['Passes picados totais', num(s.passes_picados_totais)],
+            ['Passes no terço final certos', num(s.passes_terco_final_certos)],
+            ['Passes no campo contrário (certos)', num(s.passes_campo_contrario_certos)],
+            ['Passes no campo contrário (totais)', num(s.passes_campo_contrario_totais)],
+            ['Passes no próprio campo (certos)', num(s.passes_proprio_campo_certos)],
+            ['Passes no próprio campo (totais)', num(s.passes_proprio_campo_totais)],
+            ['Cruzamentos certos', num(s.cruzamentos_certos)],
+            ['Cruzamentos totais', num(s.cruzamentos_totais)],
+            ['% Cruzamentos certos', pctv(s.cruzamentos_certos_pct)],
+            ['Bolas longas certas', num(s.bolas_longas_certas)],
+            ['Bolas longas totais', num(s.bolas_longas_totais)],
+            ['% Bolas longas certas', pctv(s.bolas_longas_certas_pct)],
+        ],
+    });
+
+    secoes.push({
+        titulo: 'Duelos & Físico',
+        linhas: [
+            ['Duelos aéreos ganhos', num(s.duelos_aereos_ganhos)],
+            ['% Duelos aéreos ganhos', pctv(s.duelos_aereos_ganhos_pct)],
+            ['Duelos aéreos perdidos', num(s.duelos_aereos_perdidos)],
+            ['Duelos terrestres ganhos', num(s.duelos_terrestres_ganhos)],
+            ['% Duelos terrestres ganhos', pctv(s.duelos_terrestres_ganhos_pct)],
+            ['Duelos totais ganhos', num(s.duelos_totais_ganhos)],
+            ['% Duelos totais ganhos', pctv(s.duelos_totais_ganhos_pct)],
+            ['Duelos perdidos', num(s.duelos_perdidos)],
+            ['Dribles conseguidos', num(s.dribles_conseguidos)],
+            ['Dribles tentados', num(s.dribles_tentados)],
+            ['% Dribles conseguidos', pctv(s.dribles_conseguidos_pct)],
+            ['Driblado pelo adversário', num(s.driblado_por_adversario)],
+            ['Perdas de bola por desarme', num(s.perdas_por_desarme)],
+            ['Toques', num(s.toques)],
+            ['Recuperações de bola', num(s.recuperacoes_bola)],
+            ['Posse perdida', num(s.posse_perdida)],
+            ['Posse ganha (terço final)', num(s.posse_ganha_terco_final)],
+        ],
+    });
+
+    secoes.push({
+        titulo: 'Defesa (Sofascore)',
+        linhas: [
+            ['Desarmes ganhos', num(s.desarmes_ganhos)],
+            ['% Desarmes ganhos', pctv(s.desarmes_ganhos_pct)],
+            ['Alívios / cortes', num(s.alivios)],
+            ['Erros que geraram golo', num(s.erros_geraram_golo)],
+            ['Erros que geraram remate', num(s.erros_geraram_remate)],
+        ],
+    });
+
+    secoes.push({
+        titulo: 'Bola parada & Penáltis',
+        linhas: [
+            ['% Conversão bola parada', pctv(s.conversao_bola_parada_pct)],
+            ['Remates de bola parada', num(s.remates_bola_parada)],
+            ['Golos de penálti', num(s.golos_penalti)],
+            ['Penáltis batidos', num(s.penaltis_batidos)],
+            ['Penáltis à baliza', num(s.penaltis_batidos_a_baliza)],
+            ['Penáltis para fora', num(s.penaltis_batidos_fora)],
+            ['Penáltis ao poste', num(s.penaltis_batidos_poste)],
+            ['% Conversão de penáltis', pctv(s.penaltis_conversao_pct)],
+            ['Penáltis conquistados', num(s.penaltis_conquistados)],
+            ['Penáltis cometidos', num(s.penaltis_cometidos)],
+        ],
+    });
+
+    secoes.push({
+        titulo: 'Disciplina & Regularidade',
+        linhas: [
+            ['Faltas cometidas', num(s.faltas)],
+            ['Sofreu faltas', num(s.sofreu_faltas)],
+            ['Fora de jogo', num(s.foras_de_jogo)],
+            ['Cartões vermelhos diretos', num(s.cartoes_vermelhos_diretos)],
+            ['Segundo amarelo', num(s.segundo_amarelo)],
+            ['Rating médio', num(s.rating)],
+            ['Rating acumulado', num(s.rating_total)],
+            ['Jogos com rating', num(s.jogos_com_rating)],
+            ['Frequência de finalização', num(s.frequencia_finalizacao)],
+            ['Presenças no onze da semana', num(s.presencas_equipa_semana)],
+        ],
+    });
+
+    return secoes;
+}
+
+function renderRiscoLesao(lista){
+    const DIAS_EPOCA = 300;
+    const diasEpocaAtual = lista
+        .filter(l => l.epoca === '24/25')
+        .reduce((soma, l) => soma + (l.dias_indisponivel || 0), 0);
+    const pct = Math.min(100, diasEpocaAtual / DIAS_EPOCA * 100);
+    const diasMostrados = Math.min(diasEpocaAtual, DIAS_EPOCA);
+    const cor = pct >= 50 ? '#FF6E5C' : (pct >= 20 ? '#fbbf24' : '#39C98C');
+    return `
+        <div class="stat-section" style="margin-bottom:24px">
+            <div class="stat-section-title">Risco de lesão (24/25)</div>
+            <div class="stat-line">
+                <span>% da época perdida por lesão</span>
+                <span class="v-chip" style="background:${cor}22;color:${cor};border-color:${cor}66">${pct.toFixed(0)}% (${diasMostrados}d)</span>
+            </div>
+        </div>
+    `;
+}
+
+function drawLesoesChart(lista){
+    const validas = lista.filter(l => l.dias_indisponivel !== null && l.dias_indisponivel !== undefined);
+    if (!validas.length) return '';
+    const max = Math.max(...validas.map(l => l.dias_indisponivel), 1);
+    return validas.map(l => {
+        const periodo = formatarData(l.data_inicio) + (l.data_fim ? ' – ' + formatarData(l.data_fim) : '');
+        return `
+            <div class="bar-row">
+                <div class="top"><span>${esc(l.tipo_lesao)} <span style="color:var(--muted)">· ${esc(l.epoca)}</span></span><span>${l.dias_indisponivel}d</span></div>
+                <div class="bar-track"><div class="bar-fill" style="width:${(l.dias_indisponivel / max * 100).toFixed(1)}%;background:var(--red)" title="${esc(periodo)}"></div></div>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderLesoes(lista){
+    if (!lista.length){
+        return '<div class="mv-loading">Sem histórico de lesões.</div>';
+    }
+    return lista.map(l => {
+        const periodo = formatarData(l.data_inicio) + (l.data_fim ? ' – ' + formatarData(l.data_fim) : '');
+        return `
+            <div class="transfer-row">
+                <span class="epoca">${esc(l.epoca)}</span>
+                <span>${periodo}</span>
+                <span class="clubes">${esc(l.tipo_lesao)}</span>
+                <span class="transfer-tipo">${l.dias_indisponivel !== null ? l.dias_indisponivel + ' dias' : '—'}</span>
+                <span class="valor">${l.jogos_falhados !== null ? l.jogos_falhados + ' jogos' : '—'}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderSimilaresDropdown(jogadorId){
+    const cache = similaresCache[jogadorId];
+
+    if (!cache || cache.carregando){
+        return '<div class="mv-loading">A carregar jogadores semelhantes…</div>';
+    }
+    if (cache.erro){
+        return '<div class="mv-loading">Não foi possível carregar jogadores semelhantes.</div>';
+    }
+
+    return `
+        <div class="mv-section">
+            ${renderSimilaresSection(cache.similares)}
+        </div>
+    `;
+}
+
+function similarCardHTML(s){
+    return `
+        <div class="similar-card" onclick="event.stopPropagation(); abrirPerfilCompleto(${s.jogador_id})">
+            <div class="similar-pct">${s.semelhanca_pct}%</div>
+            <div class="similar-info">
+                <div class="similar-nome">${esc(s.nome)}</div>
+                <div class="similar-meta">${crestHTML(s.equipa, s.clube_transfermarkt_id, 14)} ${esc(s.equipa)} · ${esc(s.competicao)}
+                    ${s.valor_mercado != null ? ' · ' + formatarValorCompacto(Number(s.valor_mercado)) : ''}</div>
+            </div>
+            <div class="similar-score">${s.scouting_score ?? '—'}</div>
+        </div>
+    `;
+}
+
+function renderSimilaresSection(dados){
+    if (!dados){
+        return '<p class="empty">Sem jogadores semelhantes (amostra insuficiente ou sem dados na posição).</p>';
+    }
+
+    if (!dados.bandas){
+        const geral = dados.geral || [];
+        if (!geral.length) return '<p class="empty">Sem jogadores semelhantes (amostra insuficiente ou sem dados na posição).</p>';
+        return `
+            <p class="similares-aviso">Sem valor de mercado conhecido para este jogador — a mostrar só por perfil de jogo.</p>
+            <div class="similares-lista">${geral.map(similarCardHTML).join('')}</div>
+        `;
+    }
+
+    const bandas = [
+        ['superior', 'Nível superior (valor mais alto)'],
+        ['igual', 'Valor semelhante'],
+        ['inferior', 'Alternativas mais baratas'],
+    ];
+
+    return `
+        ${bandas.map(([chave, titulo]) => `
+            <div class="similares-banda">
+                <div class="similares-banda-titulo">${titulo}</div>
+                ${dados.bandas[chave].length
+                    ? `<div class="similares-lista">${dados.bandas[chave].map(similarCardHTML).join('')}</div>`
+                    : '<p class="empty">Nenhum jogador com perfil parecido encontrado nesta faixa de valor.</p>'}
+            </div>
+        `).join('')}
+    `;
+}
+
+/* ---------- posição detalhada (mini-campo com marcadores) ---------- */
+const POSICAO_COORDS = {
+    'Guarda-Redes': [50, 6],
+    'Defesa Central': [50, 20],
+    'Lateral Direito': [82, 24],
+    'Lateral Esquerdo': [18, 24],
+    'Médio Defensivo': [50, 38],
+    'Médio Centro': [50, 52],
+    'Médio Ofensivo': [50, 66],
+    'Médio Direito': [72, 56],
+    'Médio Esquerdo': [28, 56],
+    'Extremo Direito': [85, 76],
+    'Extremo Esquerdo': [15, 76],
+    'Ponta de Lança': [50, 88],
+    'Segundo Avançado': [50, 78],
+};
+
+function drawPosicaoDetalhada(posicaoPrincipal, posicoesSecundarias){
+    const w = 220, h = 320;
+    const campo = `
+        <rect x="0" y="0" width="${w}" height="${h}" rx="8" fill="#16321f" stroke="rgba(255,255,255,.35)" stroke-width="1.2"/>
+        <line x1="0" y1="${h/2}" x2="${w}" y2="${h/2}" stroke="rgba(255,255,255,.35)" stroke-width="1.2"/>
+        <circle cx="${w/2}" cy="${h/2}" r="30" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.2"/>
+        <rect x="${w/2-45}" y="0" width="90" height="35" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.2"/>
+        <rect x="${w/2-45}" y="${h-35}" width="90" height="35" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.2"/>
+    `;
+    const pontoParaXY = (nome) => {
+        const coords = POSICAO_COORDS[nome];
+        if (!coords) return null;
+        return [coords[0] / 100 * w, h - (coords[1] / 100 * h)];
+    };
+
+    let marcadores = '';
+    const secundarias = posicoesSecundarias || [];
+    secundarias.forEach(pos => {
+        const xy = pontoParaXY(pos);
+        if (!xy) return;
+        marcadores += `<circle cx="${xy[0].toFixed(1)}" cy="${xy[1].toFixed(1)}" r="9" fill="var(--muted)" opacity="0.85" stroke="var(--panel)" stroke-width="2"/>`;
+    });
+    const principal = pontoParaXY(posicaoPrincipal);
+    if (principal){
+        marcadores += `<circle cx="${principal[0].toFixed(1)}" cy="${principal[1].toFixed(1)}" r="12" fill="var(--accent)" stroke="var(--panel)" stroke-width="2"/>`;
+    }
+
+    const legenda = `
+        <div class="posicao-legenda">
+            <div><span class="dot" style="background:var(--accent)"></span>Posição principal: <strong>${esc(posicaoPrincipal || '—')}</strong></div>
+            ${secundarias.length ? `<div><span class="dot" style="background:var(--muted)"></span>Posições secundárias: <strong>${esc(secundarias.join(', '))}</strong></div>` : ''}
+        </div>
+    `;
+
+    return `
+        <svg viewBox="0 0 ${w} ${h}" width="100%" height="100%" style="max-width:200px;display:block;margin:0 auto">
+            ${campo}
+            ${marcadores}
+        </svg>
+        ${legenda}
+    `;
+}
+
+function renderPlayerRow(p, renderFnName = 'renderPlayers'){
+    const anos = idade(p.data_nascimento);
+    const isOpen = openRowId === p.jogador_id;
+    const similaresAberto = similaresAbertosIds.has(p.jogador_id);
+    const radarParts = drawRadarParts(p.radar || [], p.competicao);
+
+    const bio = [
+        ['Liga', p.competicao || '—'],
+        ['Idade', anos !== null ? anos + ' anos' : '—'],
+        ['Contrato até', formatarData(p.contrato)],
+        ['Valor de mercado', p.valor_mercado !== null && p.valor_mercado !== undefined ? formatarValorCompacto(Number(p.valor_mercado)) : '—'],
+    ];
+
+    return `
+        <tr class="player-row${isOpen ? ' open' : ''}" data-id="${p.jogador_id}">
+            <td class="jogador-cell">
+                <div class="avatar-mini">${initials(p.nome)}</div>
+                <div class="jogador-nome-cell">
+                    <b>${esc(p.nome)} ${lesionadoBadgeHTML(p.lesao_atual_tipo, p.lesao_atual_dias)}${potencialBadgeHTML(p.jovem_potencial)}</b>
+                    <span class="jogador-club-cell">${crestHTML(p.equipa, p.clube_transfermarkt_id, 13)} ${esc(p.equipa)} · ${nacionalidadeHTML(p.nacionalidade)} ${emprestadoBadgeHTML(p.clube_dono)}</span>
+                </div>
+            </td>
+            <td>
+                <span class="pos-chip">${esc(p.posicao_principal) || '—'}</span>
+                ${(p.posicoes_secundarias || []).map(pos => `<span class="pos-chip sec">${esc(pos)}</span>`).join('')}
+            </td>
+            <td class="num">${anos ?? '—'}</td>
+            <td class="num">${p.jogos ?? 0}</td>
+            <td class="num">${p.golos ?? 0}</td>
+            <td class="num">${p.assistencias ?? 0}</td>
+            <td class="num rating-cell">${p.classificacao_media ?? '—'}</td>
+            <td><button class="comparar-toggle${estaSelecionadoComparar(p.jogador_id) ? ' active' : ''}" data-id="${p.jogador_id}" title="Adicionar à comparação de jogadores" onclick="event.stopPropagation(); toggleComparar(${p.jogador_id}, '${esc(p.nome).replace(/'/g, "\\'")}')">VS</button></td>
+            <td><div class="chevron">▾</div></td>
+        </tr>
+        <tr class="player-detail-row${isOpen ? ' open' : ''}" data-id="${p.jogador_id}">
+            <td colspan="9">
+                <div class="player-detail">
+                    <button class="perfil-share" style="margin-bottom:16px" onclick="event.stopPropagation(); abrirPerfilCompleto(${p.jogador_id})">↗ Ver perfil completo</button>
+                    <div class="detail-grid-3">
+                        <div>
+                            <div class="bio-grid">
+                                ${bio.map(([l, v]) => `<div class="bio-item"><div class="l">${esc(l)}</div><div class="v">${esc(v)}</div></div>`).join('')}
+                            </div>
+                        </div>
+                        <div class="radar-centro">
+                            ${radarParts.svg}
+                            <div class="radar-title">Perfil normalizado dentro do grupo posicional (${POSICAO_LABEL[p.posicao_api] || esc(p.posicao_api)})</div>
+                            ${radarParts.legend}
+                            ${avisoPercentilHTML(p)}
+                        </div>
+                        ${radarParts.lista}
+                    </div>
+                    <div style="margin-top:24px;text-align:center">
+                        <button class="pill" onclick="event.stopPropagation(); toggleSimilares(${p.jogador_id}, ${renderFnName})">
+                            ${similaresAberto ? 'Ocultar jogadores semelhantes' : 'Mostrar jogadores semelhantes'}
+                        </button>
+                        ${similaresAberto ? `<div style="margin-top:16px;text-align:left">${renderSimilaresDropdown(p.jogador_id)}</div>` : ''}
+                    </div>
+                </div>
+            </td>
+        </tr>
+    `;
+}
+
+function popularFiltrosDependentes(){
+    const ligas = [...new Set(jogadoresCache.map(p => p.competicao).filter(Boolean))].sort();
+    const ligaAtual = filtroLiga;
+    const porPais = {};
+    ligas.forEach(l => {
+        const info = COMPETICAO_PAIS[l] || { pais: l, iso: '' };
+        (porPais[info.pais] = porPais[info.pais] || { iso: info.iso, ligas: [] }).ligas.push(l);
+    });
+    $('leagueSelect').innerHTML = '<option value="">Todas</option>' +
+        Object.keys(porPais).sort().map(pais => {
+            const grupo = porPais[pais];
+            const bandeira = grupo.iso ? codigoParaEmoji(grupo.iso) + ' ' : '';
+            return `<optgroup label="${esc(bandeira + pais)}">` +
+                grupo.ligas.map(l => `<option value="${esc(l)}"${l === ligaAtual ? ' selected' : ''}>${esc(l)}</option>`).join('') +
+                `</optgroup>`;
+        }).join('');
+
+    const clubes = [...new Set(
+        jogadoresCache
+            .filter(p => !filtroLiga || p.competicao === filtroLiga)
+            .map(p => p.equipa)
+            .filter(Boolean)
+    )].sort();
+    if (filtroClube && !clubes.includes(filtroClube)) filtroClube = '';
+    const clubeAtual = filtroClube;
+    $('clubSelect').innerHTML = '<option value="">Todos</option>' +
+        clubes.map(c => `<option value="${esc(c)}"${c === clubeAtual ? ' selected' : ''}>${esc(c)}</option>`).join('');
+
+    const posicoes = Object.keys(POSITION_COLORS).filter(pos =>
+        jogadoresCache.some(p => p.posicao_principal === pos));
+    $('positionPills').innerHTML = [`<button class="pill${filtroPosicao.size === 0 ? ' active' : ''}" data-pos="">Todas</button>`]
+        .concat(posicoes.map(pos => `<button class="pill${filtroPosicao.has(pos) ? ' active' : ''}" data-pos="${esc(pos)}">${esc(pos)}</button>`))
+        .join('');
+    $('positionPills').querySelectorAll('.pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (!btn.dataset.pos){
+                filtroPosicao.clear();
+            } else if (filtroPosicao.has(btn.dataset.pos)){
+                filtroPosicao.delete(btn.dataset.pos);
+            } else {
+                filtroPosicao.add(btn.dataset.pos);
+            }
+            $('positionPills').querySelectorAll('.pill').forEach(b =>
+                b.classList.toggle('active', b.dataset.pos ? filtroPosicao.has(b.dataset.pos) : filtroPosicao.size === 0)
+            );
+            renderPlayers();
+        });
+    });
+
+    const posSecundarias = [...new Set(
+        jogadoresCache.flatMap(p => p.posicoes_secundarias || [])
+    )].sort();
+    $('posSecundariaPills').innerHTML = [`<button class="pill${filtroPosSecundaria.size === 0 ? ' active' : ''}" data-pos="">Qualquer</button>`]
+        .concat(posSecundarias.map(pos => `<button class="pill${filtroPosSecundaria.has(pos) ? ' active' : ''}" data-pos="${esc(pos)}">${esc(pos)}</button>`))
+        .join('');
+    $('posSecundariaPills').querySelectorAll('.pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (!btn.dataset.pos){
+                filtroPosSecundaria.clear();
+            } else if (filtroPosSecundaria.has(btn.dataset.pos)){
+                filtroPosSecundaria.delete(btn.dataset.pos);
+            } else {
+                filtroPosSecundaria.add(btn.dataset.pos);
+            }
+            $('posSecundariaPills').querySelectorAll('.pill').forEach(b =>
+                b.classList.toggle('active', b.dataset.pos ? filtroPosSecundaria.has(b.dataset.pos) : filtroPosSecundaria.size === 0)
+            );
+            renderPlayers();
+        });
+    });
+
+    renderNacionalidadePills();
+}
+
+function renderNacionalidadePills(){
+    const contagem = {};
+    jogadoresCache.forEach(p => { if (p.nacionalidade) contagem[p.nacionalidade] = (contagem[p.nacionalidade] || 0) + 1; });
+    const todas = Object.keys(contagem).sort((a, b) => contagem[b] - contagem[a]);
+    const top = todas.slice(0, 6);
+    const visiveis = [...new Set([...top, ...filtroNacionalidade])];
+
+    $('nacionalidadePills').innerHTML = visiveis.map(nac =>
+        `<button class="pill${filtroNacionalidade.has(nac) ? ' active' : ''}" data-nac="${esc(nac)}">${esc(nac)}</button>`
+    ).join('') + `<select id="nacionalidadeAdd" class="pill">
+        <option value="">+ adicionar</option>
+        ${todas.filter(n => !visiveis.includes(n)).map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('')}
+    </select>`;
+
+    $('nacionalidadePills').querySelectorAll('button.pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const nac = btn.dataset.nac;
+            if (filtroNacionalidade.has(nac)) filtroNacionalidade.delete(nac);
+            else filtroNacionalidade.add(nac);
+            renderNacionalidadePills();
+            renderPlayers();
+        });
+    });
+    $('nacionalidadeAdd').addEventListener('change', () => {
+        const nac = $('nacionalidadeAdd').value;
+        if (nac){
+            filtroNacionalidade.add(nac);
+            renderNacionalidadePills();
+            renderPlayers();
+        }
+    });
+}
+
+function atualizarKPIs(lista){
+    $('kpiJogadores').textContent = lista.length;
+    $('kpiClubes').textContent = new Set(lista.map(p => p.equipa).filter(Boolean)).size;
+
+    const idades = lista.map(p => idade(p.data_nascimento)).filter(a => a !== null);
+    $('kpiIdade').textContent = idades.length ? (Math.round(idades.reduce((s, a) => s + a, 0) / idades.length * 10) / 10) : '—';
+
+    const marcador = [...lista].sort((a, b) => (b.golos || 0) - (a.golos || 0))[0];
+    $('kpiMarcador').textContent = marcador && marcador.golos ? marcador.golos + ' golos' : '—';
+    $('kpiMarcadorSub').textContent = marcador && marcador.golos ? marcador.nome : '';
+
+    const melhorRating = [...lista].filter(p => p.classificacao_media).sort((a, b) => b.classificacao_media - a.classificacao_media)[0];
+    $('kpiRating').textContent = melhorRating ? melhorRating.classificacao_media : '—';
+    $('kpiRatingSub').textContent = melhorRating ? melhorRating.nome : '';
+
+    const melhorScore = [...lista].sort((a, b) => (b.scouting_score || 0) - (a.scouting_score || 0))[0];
+    $('kpiScore').textContent = melhorScore ? melhorScore.scouting_score : '—';
+    $('kpiScoreSub').textContent = melhorScore ? melhorScore.nome : '';
+}
+
+const CONTRATO_LABELS = {'0': 'Já expirado', '0.5': 'Até 6 meses', '1': 'Último ano', '2': 'Até 2 anos', '3': 'Até 3 anos', '4+': '4 ou mais anos'};
+
+function construirChipsFiltros(){
+    const chips = [];
+    if (filtroLiga) chips.push({ label: `Competição: ${filtroLiga}`, limpar: () => {
+        filtroLiga = ''; $('leagueSelect').value = ''; popularFiltrosDependentes();
+    }});
+    if (filtroClube) chips.push({ label: `Clube: ${filtroClube}`, limpar: () => {
+        filtroClube = ''; $('clubSelect').value = '';
+    }});
+    if (filtroPosicao.size) chips.push({ label: `Posição: ${[...filtroPosicao].join(' / ')}`, limpar: () => {
+        filtroPosicao.clear();
+        $('positionPills').querySelectorAll('.pill').forEach(b => b.classList.toggle('active', !b.dataset.pos));
+    }});
+    if (filtroPosSecundaria.size) chips.push({ label: `Posição secundária: ${[...filtroPosSecundaria].join(' / ')}`, limpar: () => {
+        filtroPosSecundaria.clear();
+        $('posSecundariaPills').querySelectorAll('.pill').forEach(b => b.classList.toggle('active', !b.dataset.pos));
+    }});
+    if (filtroIdadeMin !== null || filtroIdadeMax !== null) chips.push({
+        label: `Idade: ${filtroIdadeMin ?? '–'}–${filtroIdadeMax ?? '–'}`, limpar: () => {
+            filtroIdadeMin = null; filtroIdadeMax = null;
+            $('idadeMin').value = ''; $('idadeMax').value = '';
+        }
+    });
+    if (filtroAlturaMin !== null || filtroAlturaMax !== null) chips.push({
+        label: `Altura: ${filtroAlturaMin ?? '–'}–${filtroAlturaMax ?? '–'} cm`, limpar: () => {
+            filtroAlturaMin = null; filtroAlturaMax = null;
+            $('alturaMin').value = ''; $('alturaMax').value = '';
+        }
+    });
+    if (filtroPe) chips.push({ label: `Pé: ${filtroPe}`, limpar: () => {
+        filtroPe = ''; $('filtroPe').value = '';
+    }});
+    if (filtroContratoSel !== '') chips.push({
+        label: `Contrato: ${CONTRATO_LABELS[filtroContratoSel] ?? filtroContratoSel}`, limpar: () => {
+            filtroContratoSel = ''; $('filtroContratoSelect').value = '';
+        }
+    });
+    if (filtroJogosMin) chips.push({ label: `Jogos mínimos: ${filtroJogosMin}`, limpar: () => {
+        filtroJogosMin = 0; $('jogosMinInput').value = '0';
+    }});
+    if (filtroRatingMin !== null || filtroRatingMax !== null) chips.push({
+        label: `Rating: ${filtroRatingMin ?? '–'}–${filtroRatingMax ?? '–'}`, limpar: () => {
+            filtroRatingMin = null; filtroRatingMax = null;
+            $('ratingMin').value = ''; $('ratingMax').value = '';
+        }
+    });
+    if (filtroGolosPor90Min !== null) chips.push({ label: `Golos/90 ≥ ${filtroGolosPor90Min}`, limpar: () => {
+        filtroGolosPor90Min = null; $('golosPor90Min').value = '';
+    }});
+    if (filtroXgEficaciaMin !== null || filtroXgEficaciaMax !== null) chips.push({
+        label: `xG-Golos: ${filtroXgEficaciaMin ?? '–'}–${filtroXgEficaciaMax ?? '–'}`, limpar: () => {
+            filtroXgEficaciaMin = null; filtroXgEficaciaMax = null;
+            $('xgEficaciaMin').value = ''; $('xgEficaciaMax').value = '';
+        }
+    });
+    if (filtroValorMercadoMin !== null || filtroValorMercadoMax !== null) chips.push({
+        label: `Valor: ${filtroValorMercadoMin ?? '–'}–${filtroValorMercadoMax ?? '–'} M€`, limpar: () => {
+            filtroValorMercadoMin = null; filtroValorMercadoMax = null;
+            $('valorMercadoMin').value = ''; $('valorMercadoMax').value = '';
+        }
+    });
+    if (filtroEmprestados) chips.push({ label: 'Apenas emprestados', limpar: () => {
+        filtroEmprestados = false; $('filtroEmprestados').checked = false;
+    }});
+    if (filtroTaca) chips.push({ label: 'Jogou a Taça de Portugal', limpar: () => {
+        filtroTaca = false; $('filtroTaca').checked = false;
+    }});
+    if (filtroNacionalidade.size) chips.push({ label: `Nacionalidade: ${[...filtroNacionalidade].join(' / ')}`, limpar: () => {
+        filtroNacionalidade.clear(); renderNacionalidadePills();
+    }});
+    return chips;
+}
+
+function atualizarResumoFiltros(count){
+    $('filtrosResumoCount').innerHTML = `<b>${count}</b> jogador${count === 1 ? '' : 'es'} encontrado${count === 1 ? '' : 's'}`;
+    const chips = construirChipsFiltros();
+    $('filtrosResumoChips').innerHTML = chips.map((c, i) =>
+        `<span class="filtro-chip" data-i="${i}">${esc(c.label)}<button aria-label="Remover filtro">✕</button></span>`
+    ).join('');
+    $('filtrosResumoChips').querySelectorAll('.filtro-chip button').forEach((btn, i) => {
+        btn.addEventListener('click', () => { chips[i].limpar(); renderPlayers(); });
+    });
+}
+
+function contarFiltrosAvancadosAtivos(){
+    let n = 0;
+    if (filtroPosicao.size) n++;
+    if (filtroPosSecundaria.size) n++;
+    if (filtroIdadeMin !== null || filtroIdadeMax !== null) n++;
+    if (filtroAlturaMin !== null || filtroAlturaMax !== null) n++;
+    if (filtroPe) n++;
+    if (filtroContratoSel !== '') n++;
+    if (filtroRatingMin !== null || filtroRatingMax !== null) n++;
+    if (filtroGolosPor90Min !== null) n++;
+    if (filtroXgEficaciaMin !== null || filtroXgEficaciaMax !== null) n++;
+    if (filtroValorMercadoMin !== null || filtroValorMercadoMax !== null) n++;
+    if (filtroEmprestados) n++;
+    if (filtroTaca) n++;
+    if (filtroNacionalidade.size) n++;
+    return n;
+}
+
+function atualizarBadgeFiltrosAvancados(){
+    const n = contarFiltrosAvancadosAtivos();
+    const badge = $('badgeFiltrosAvancados');
+    badge.textContent = n;
+    badge.classList.toggle('hidden', n === 0);
+    $('toggleFiltrosAvancados').classList.toggle('tem-filtros-ativos', n > 0);
+}
+
+function textoRangeLive(min, max, unidade){
+    if (min === null && max === null) return 'qualquer';
+    if (min !== null && max !== null) return `${min} – ${max}${unidade || ''}`;
+    if (min !== null) return `≥ ${min}${unidade || ''}`;
+    return `≤ ${max}${unidade || ''}`;
+}
+
+function atualizarLivesFiltros(){
+    $('idadeLive').textContent = textoRangeLive(filtroIdadeMin, filtroIdadeMax, ' anos');
+    $('alturaLive').textContent = textoRangeLive(filtroAlturaMin, filtroAlturaMax, '');
+    $('ratingLive').textContent = textoRangeLive(filtroRatingMin, filtroRatingMax, '');
+    $('golosPor90Live').textContent = filtroGolosPor90Min === null ? 'qualquer' : `≥ ${filtroGolosPor90Min}`;
+    $('xgEficaciaLive').textContent = textoRangeLive(filtroXgEficaciaMin, filtroXgEficaciaMax, '');
+    $('valorMercadoLive').textContent = textoRangeLive(filtroValorMercadoMin, filtroValorMercadoMax, '');
+}
+
+let sortKey = 'scouting_score';
+let sortDir = 'desc';
+
+function ordenarPor(chave){
+    if (sortKey === chave){
+        sortDir = sortDir === 'desc' ? 'asc' : 'desc';
+    } else {
+        sortKey = chave;
+        sortDir = chave === 'nome' ? 'asc' : 'desc';
+    }
+    atualizarHeaderOrdenacao();
+    renderPlayers();
+}
+
+function atualizarHeaderOrdenacao(){
+    document.querySelectorAll('.player-table-wrap .sort-col').forEach(el => {
+        const seta = el.querySelector('.sort-arrow');
+        if (el.dataset.sort === sortKey){
+            el.classList.add('active');
+            seta.textContent = sortDir === 'desc' ? '▼' : '▲';
+        } else {
+            el.classList.remove('active');
+            seta.textContent = '';
+        }
+    });
+}
+
+let paginaAtual = 1;
+let ultimaChaveFiltros = null;
+const JOGADORES_POR_PAGINA = 30;
+
+function irParaPagina(n){
+    paginaAtual = n;
+    renderPlayers();
+    document.querySelector('#jogadores h1').scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+function renderPaginacao(totalJogadores, totalPaginas){
+    if (totalPaginas <= 1){
+        $('paginacao').innerHTML = '';
+        return;
+    }
+    $('paginacao').innerHTML = `
+        <button class="pill" ${paginaAtual === 1 ? 'disabled' : ''} onclick="irParaPagina(1)">« Primeira</button>
+        <button class="pill" ${paginaAtual === 1 ? 'disabled' : ''} onclick="irParaPagina(${paginaAtual - 1})">‹ Anterior</button>
+        <span class="paginacao-info">Página ${paginaAtual} de ${totalPaginas} · ${totalJogadores} jogadores</span>
+        <button class="pill" ${paginaAtual === totalPaginas ? 'disabled' : ''} onclick="irParaPagina(${paginaAtual + 1})">Seguinte ›</button>
+        <button class="pill" ${paginaAtual === totalPaginas ? 'disabled' : ''} onclick="irParaPagina(${totalPaginas})">Última »</button>
+    `;
+}
+
+function renderPlayers(){
+    const search = semAcentos($('playerSearch').value.trim());
+
+    let lista = jogadoresCache.filter(p => {
+        const matchNome = !search || semAcentos(p.nome).includes(search);
+        const matchLiga = !filtroLiga || p.competicao === filtroLiga;
+        const matchClube = !filtroClube || p.equipa === filtroClube;
+        const matchPos = filtroPosicao.size === 0 || filtroPosicao.has(p.posicao_principal);
+
+        const anos = idade(p.data_nascimento);
+        const matchIdadeMin = filtroIdadeMin === null || (anos !== null && anos >= filtroIdadeMin);
+        const matchIdadeMax = filtroIdadeMax === null || (anos !== null && anos <= filtroIdadeMax);
+
+        const matchAlturaMin = filtroAlturaMin === null || (p.altura !== null && p.altura >= filtroAlturaMin);
+        const matchAlturaMax = filtroAlturaMax === null || (p.altura !== null && p.altura <= filtroAlturaMax);
+
+        const matchPe = !filtroPe || p.pe_preferencial === filtroPe;
+        const matchPosSecundaria = filtroPosSecundaria.size === 0 || (p.posicoes_secundarias || []).some(pos => filtroPosSecundaria.has(pos));
+
+        const anosContrato = anosContratoRestantes(p.contrato);
+        const matchContrato = filtroContratoSel === ''
+            || (anosContrato !== null && (
+                filtroContratoSel === '4+' ? anosContrato >= 4 : anosContrato <= Number(filtroContratoSel)
+            ));
+
+        const matchJogosMin = !filtroJogosMin || (p.jogos ?? 0) >= filtroJogosMin;
+
+        const matchRatingMin = filtroRatingMin === null || (p.classificacao_media !== null && p.classificacao_media !== undefined && p.classificacao_media >= filtroRatingMin);
+        const matchRatingMax = filtroRatingMax === null || (p.classificacao_media !== null && p.classificacao_media !== undefined && p.classificacao_media <= filtroRatingMax);
+
+        const golosPor90 = p.minutos ? (p.golos || 0) / p.minutos * 90 : null;
+        const matchGolosPor90 = filtroGolosPor90Min === null || (golosPor90 !== null && golosPor90 >= filtroGolosPor90Min);
+
+        const xgEficacia = (p.golos_esperados !== null && p.golos_esperados !== undefined) ? (p.golos || 0) - p.golos_esperados : null;
+        const matchXgMin = filtroXgEficaciaMin === null || (xgEficacia !== null && xgEficacia >= filtroXgEficaciaMin);
+        const matchXgMax = filtroXgEficaciaMax === null || (xgEficacia !== null && xgEficacia <= filtroXgEficaciaMax);
+
+        const valorMercadoM = p.valor_mercado !== null && p.valor_mercado !== undefined ? p.valor_mercado / 1_000_000 : null;
+        const matchValorMin = filtroValorMercadoMin === null || (valorMercadoM !== null && valorMercadoM >= filtroValorMercadoMin);
+        const matchValorMax = filtroValorMercadoMax === null || (valorMercadoM !== null && valorMercadoM <= filtroValorMercadoMax);
+
+        const matchEmprestados = !filtroEmprestados || !!p.clube_dono;
+        const matchTaca = !filtroTaca || !!p.jogou_taca_portugal;
+        const matchNacionalidade = filtroNacionalidade.size === 0 || filtroNacionalidade.has(p.nacionalidade);
+
+        return matchNome && matchLiga && matchClube && matchPos
+            && matchIdadeMin && matchIdadeMax && matchAlturaMin && matchAlturaMax
+            && matchPe && matchPosSecundaria && matchContrato && matchJogosMin
+            && matchRatingMin && matchRatingMax && matchGolosPor90 && matchXgMin && matchXgMax
+            && matchValorMin && matchValorMax && matchEmprestados && matchTaca && matchNacionalidade;
+    });
+
+    atualizarKPIs(lista);
+    atualizarResumoFiltros(lista.length);
+    atualizarLivesFiltros();
+    atualizarBadgeFiltrosAvancados();
+
+    lista = [...lista].sort((a, b) => {
+        if (sortKey === 'nome'){
+            const cmp = semAcentos(a.nome || '').localeCompare(semAcentos(b.nome || ''));
+            return sortDir === 'asc' ? cmp : -cmp;
+        }
+        if (sortKey === 'idade'){
+            const va = idade(a.data_nascimento) ?? -1;
+            const vb = idade(b.data_nascimento) ?? -1;
+            return sortDir === 'desc' ? vb - va : va - vb;
+        }
+        const va = a[sortKey] || 0;
+        const vb = b[sortKey] || 0;
+        return sortDir === 'desc' ? vb - va : va - vb;
+    });
+
+    const chaveFiltros = JSON.stringify([
+        search, filtroLiga, filtroClube, [...filtroPosicao].sort(),
+        filtroIdadeMin, filtroIdadeMax, filtroAlturaMin, filtroAlturaMax,
+        filtroPe, [...filtroPosSecundaria].sort(), filtroContratoSel, sortKey, sortDir,
+        filtroRatingMin, filtroRatingMax, filtroGolosPor90Min, filtroXgEficaciaMin, filtroXgEficaciaMax,
+        filtroValorMercadoMin, filtroValorMercadoMax, filtroEmprestados, filtroTaca, [...filtroNacionalidade].sort(),
+    ]);
+    if (chaveFiltros !== ultimaChaveFiltros){
+        paginaAtual = 1;
+        ultimaChaveFiltros = chaveFiltros;
+    }
+
+    const totalPaginas = Math.max(1, Math.ceil(lista.length / JOGADORES_POR_PAGINA));
+    if (paginaAtual > totalPaginas) paginaAtual = totalPaginas;
+
+    const inicio = (paginaAtual - 1) * JOGADORES_POR_PAGINA;
+    const paginaLista = lista.slice(inicio, inicio + JOGADORES_POR_PAGINA);
+
+    $('playersGrid').innerHTML = paginaLista.length
+        ? paginaLista.map(p => renderPlayerRow(p)).join('')
+        : '<tr><td colspan="9"><p class="empty">Sem jogadores para os filtros escolhidos.</p></td></tr>';
+
+    renderPaginacao(lista.length, totalPaginas);
+}
+
+async function loadPlayers(){
+    if (!epocaAtual) await loadSeasons();
+    jogadoresCache = await api(`/api/scouting?epoca=${encodeURIComponent(epocaAtual)}`);
+    filtroLiga = ''; filtroClube = ''; filtroPosicao = new Set(); openRowId = null;
+    filtroIdadeMin = null; filtroIdadeMax = null; filtroAlturaMin = null; filtroAlturaMax = null;
+    filtroPe = ''; filtroPosSecundaria = new Set(); filtroContratoSel = '';
+    filtroRatingMin = null; filtroRatingMax = null; filtroGolosPor90Min = null;
+    filtroXgEficaciaMin = null; filtroXgEficaciaMax = null;
+    filtroValorMercadoMin = null; filtroValorMercadoMax = null;
+    filtroEmprestados = false; filtroTaca = false; filtroNacionalidade = new Set();
+    popularFiltrosDependentes();
+    renderPlayers();
+}
+
+async function carregarSimilares(jogadorId, aoTerminar){
+    if (similaresCache[jogadorId]) return;
+    similaresCache[jogadorId] = { carregando: true };
+    try {
+        const similares = await api(`/api/jogador/${jogadorId}/similares?epoca=${encodeURIComponent(epocaAtual)}`);
+        similaresCache[jogadorId] = { carregando: false, similares };
+    } catch (e) {
+        similaresCache[jogadorId] = { carregando: false, erro: true };
+    }
+    if (openRowId === jogadorId && aoTerminar) aoTerminar();
+}
+
+$('playersGrid').addEventListener('click', e => {
+    const row = e.target.closest('.player-row');
+    if (!row) return;
+    const id = Number(row.dataset.id);
+    openRowId = openRowId === id ? null : id;
+    const scrollY = window.scrollY;
+    renderPlayers();
+    window.scrollTo(0, scrollY);
+});
+
+$('clubSelect').addEventListener('change', () => {
+    filtroClube = $('clubSelect').value;
+    renderPlayers();
+});
+
+$('leagueSelect').addEventListener('change', () => {
+    filtroLiga = $('leagueSelect').value;
+    filtroClube = '';
+    popularFiltrosDependentes();
+    renderPlayers();
+});
+
+/* ============================================================
+   CLUBES
+============================================================ */
+async function loadClubs(){
+    const rows = await api('/api/clubes');
+    if (!rows.length){
+        $('clubsTable').innerHTML = '<p class="empty">Sem clubes registados.</p>';
+        return;
+    }
+    $('clubsTable').innerHTML = `
+        <div class="table-wrap">
+        <table>
+            <thead><tr><th>Nome</th><th>Nome curto</th><th>País</th><th>Jogadores</th></tr></thead>
+            <tbody>
+                ${rows.map(r => `
+                    <tr class="clickable-row" onclick="abrirClubePagina(${r.transfermarkt_id})">
+                        <td>${crestHTML(r.nome, r.transfermarkt_id, 20)} ${esc(r.nome)}</td>
+                        <td>${esc(r.nome_curto)}</td>
+                        <td>${esc(r.pais)}</td>
+                        <td>${esc(r.total_jogadores)}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+        </div>
+    `;
+}
+
+/* ============================================================
+   PERFIL COMPLETO DE JOGADOR (página dedicada, partilhável)
+============================================================ */
+const CORES_FORMA = { V: '#39C98C', E: '#fbbf24', D: '#FF6E5C' };
+const NOMES_FORMA = { V: 'Vitória', E: 'Empate', D: 'Derrota' };
+
+function formatarDataCurta(d){
+    if (!d) return '—';
+    const dt = new Date(d);
+    if (isNaN(dt)) return '—';
+    const dia = String(dt.getUTCDate()).padStart(2, '0');
+    const mes = String(dt.getUTCMonth() + 1).padStart(2, '0');
+    return `${dia}/${mes}`;
+}
+
+function renderUltimos5HTML(lista, posicaoApi){
+    if (!lista || !lista.length){
+        return '<p class="empty" style="margin-bottom:24px">Sem jogos recentes registados.</p>';
+    }
+    const ehGuardaRedes = posicaoApi === 'Goalkeeper';
+    const ordenada = [...lista].reverse();
+    const cartoes = ordenada.map(j => {
+        const cor = CORES_FORMA[j.resultado_equipa] || 'var(--muted)';
+        const corRating = j.rating === null || j.rating === undefined ? 'var(--text)'
+            : (j.rating >= 8 ? '#39C98C' : (j.rating >= 6 ? '#fbbf24' : '#FF6E5C'));
+        let statLinha = '—';
+        if (ehGuardaRedes){
+            if (j.defesas) statLinha = `🧤 ${j.defesas} defesa${j.defesas > 1 ? 's' : ''}`;
+            else if (j.penaltis_defendidos) statLinha = `🥅 ${j.penaltis_defendidos} pén. defendido${j.penaltis_defendidos > 1 ? 's' : ''}`;
+            else if (j.golos_sofridos === 0) statLinha = '🧼 Baliza a zero';
+            else if (j.golos_sofridos > 0) statLinha = `${j.golos_sofridos} sofrido${j.golos_sofridos > 1 ? 's' : ''}`;
+        } else {
+            if (j.golos > 0) statLinha = `⚽ ${j.golos} golo${j.golos > 1 ? 's' : ''}`;
+            else if (j.assistencias > 0) statLinha = `🅰 ${j.assistencias} assist.`;
+        }
+        const tip = `${esc(j.adversario)} (${j.em_casa ? 'casa' : 'fora'}) ${j.golos_casa}-${j.golos_fora}` +
+                    ` · ${NOMES_FORMA[j.resultado_equipa] || '—'} · ${j.titular ? 'Titular' : 'Suplente'} · ${j.minutos}min`;
+        return `
+            <div class="forma-card" data-tooltip="${tip}">
+                <div class="forma-card-badge" style="background:${cor}">${esc(j.resultado_equipa || '?')}</div>
+                <div class="forma-card-jogo">${formatarDataCurta(j.data_jogo)} ${j.em_casa ? 'vs' : '@'} ${esc(j.adversario)}</div>
+                <div class="forma-card-rating" style="color:${corRating}">${j.rating ?? '—'}</div>
+                <div class="forma-card-stat">${statLinha}</div>
+            </div>
+        `;
+    }).join('');
+    return `<div class="forma-cards">${cartoes}</div>`;
+}
+
+function renderTransferenciasTabela(lista){
+    if (!lista.length) return '<p class="empty">Sem histórico de transferências.</p>';
+    return `
+        <div class="table-wrap">
+        <table>
+            <thead><tr><th>Época</th><th>Data</th><th>De</th><th>Para</th><th>Tipo</th><th>Valor</th></tr></thead>
+            <tbody>
+                ${lista.map(t => {
+                    const tipoClasse = t.tipo === 'Transferência' ? 'fee' : ((t.tipo || '').toLowerCase().includes('empréstimo') ? 'emprestimo' : '');
+                    const valorTexto = t.valor !== null && t.valor !== undefined ? formatarValorCompacto(Number(t.valor)) : '—';
+                    return `
+                        <tr>
+                            <td>${esc(t.epoca)}</td>
+                            <td>${formatarData(t.data_transferencia)}</td>
+                            <td>${esc(t.clube_origem)}</td>
+                            <td>${esc(t.clube_destino)}</td>
+                            <td><span class="transfer-tipo ${tipoClasse}">${esc(t.tipo)}</span></td>
+                            <td style="text-align:right;font-weight:700;font-family:var(--font-mono)">${valorTexto}</td>
+                        </tr>
+                    `;
+                }).join('')}
+            </tbody>
+        </table>
+        </div>
+    `;
+}
+
+function renderPerfilCompleto(p, extras){
+    const cor = positionColor(p.posicao_principal);
+    const anos = idade(p.data_nascimento);
+
+    const bio = [
+        ['Número', p.numero ?? '—'],
+        ['Clube', p.equipa || '—'],
+        ['Liga', p.competicao || '—'],
+        ['Idade', anos !== null ? anos + ' anos' : '—'],
+        ['Altura', p.altura ? p.altura + ' cm' : '—'],
+        ['Pé preferencial', p.pe_preferencial ? p.pe_preferencial[0].toUpperCase() + p.pe_preferencial.slice(1) : '—'],
+        ['Nacionalidade', p.nacionalidade || '—'],
+        ['Contrato até', formatarData(p.contrato)],
+        ['Valor de mercado', p.valor_mercado !== null && p.valor_mercado !== undefined ? formatarValorCompacto(Number(p.valor_mercado)) : '—'],
+    ];
+
+    const salarioAtual = extras.salarios && extras.salarios.length ? extras.salarios[0] : null;
+    if (salarioAtual){
+        bio.push(
+            ['Salário (anual)', formatarValorMoeda(Number(salarioAtual.salario_anual), salarioAtual.moeda)],
+            ['Salário (semanal)', formatarValorMoeda(Number(salarioAtual.salario_semanal), salarioAtual.moeda)],
+        );
+    }
+
+    const statSecs = statSections(p);
+    const sofaSecs = sofascoreSections(extras.sofascore, p.posicao_api, p.percentis_chip);
+    const temSofascore = sofaSecs.length > 0;
+
+    const ataqueSec = statSecs.find(s => s.titulo === 'Ataque');
+    const finalizacaoSec = sofaSecs.find(s => s.titulo === 'Finalização');
+    // "Penáltis marcados/falhados" (API-Football) duplicam o que "Bola
+    // parada & Penáltis" (Sofascore) já mostra com mais detalhe -- só
+    // entram como fallback para jogadores sem dados do Sofascore.
+    const linhasAtaque = ataqueSec
+        ? (temSofascore ? ataqueSec.linhas.filter(l => !l[0].startsWith('Penáltis')) : ataqueSec.linhas)
+        : [];
+    const finalizacaoCombinada = {
+        titulo: 'Finalização',
+        linhas: [...linhasAtaque, ...(finalizacaoSec ? finalizacaoSec.linhas : [])],
+    };
+
+    const duelosSec = statSecs.find(s => s.titulo === 'Duelos');
+    const duelosFisicoSec = sofaSecs.find(s => s.titulo === 'Duelos & Físico');
+    // "Duelos"/"Dribles" (API-Football) é o mesmo conceito que "Duelos &
+    // Físico" (Sofascore) já mostra com mais detalhe (aéreos vs.
+    // terrestres) -- só entra como fallback sem dados do Sofascore.
+    const duelosCombinada = (temSofascore && duelosFisicoSec)
+        ? duelosFisicoSec
+        : (duelosSec || { titulo: 'Duelos & Físico', linhas: [] });
+
+    const defesaDisciplinaSec = statSecs.find(s => s.titulo === 'Defesa / Disciplina');
+    const defesaSofaSec = sofaSecs.find(s => s.titulo === 'Defesa (Sofascore)');
+    const disciplinaRegSec = sofaSecs.find(s => s.titulo === 'Disciplina & Regularidade');
+    // "Desarmes" (API-Football) duplica "Desarmes ganhos" (Sofascore,
+    // já com % associada) -- só entra como fallback sem Sofascore.
+    const linhasDefesaDisciplina = defesaDisciplinaSec
+        ? (temSofascore ? defesaDisciplinaSec.linhas.filter(l => l[0] !== 'Desarmes') : defesaDisciplinaSec.linhas)
+        : [];
+    const defesaDisciplinaCombinada = {
+        titulo: 'Defesa & Disciplina',
+        linhas: [
+            ...linhasDefesaDisciplina,
+            ...(defesaSofaSec ? defesaSofaSec.linhas : []),
+            ...(disciplinaRegSec ? disciplinaRegSec.linhas : []),
+        ],
+    };
+
+    const tacaSecs = extras.tacaSofascore
+        ? [
+            {
+                titulo: 'Resumo',
+                linhas: [
+                    ['Jogos', num(extras.tacaSofascore.jogos)],
+                    ['Titularidades', num(extras.tacaSofascore.titularidades)],
+                    ['Minutos', num(extras.tacaSofascore.minutos)],
+                    ['Golos', num(extras.tacaSofascore.golos)],
+                    ['Assistências', num(extras.tacaSofascore.assistencias)],
+                    ['Rating médio', num(extras.tacaSofascore.rating)],
+                ],
+            },
+            ...sofascoreSections(extras.tacaSofascore, p.posicao_api, {}),
+        ]
+        : [];
+
+    const todasSecoesAtributos = [
+        finalizacaoCombinada,
+        duelosCombinada,
+        defesaDisciplinaCombinada,
+        ...statSecs.filter(s => s.titulo !== 'Ataque' && s.titulo !== 'Duelos' && s.titulo !== 'Defesa / Disciplina'),
+        ...sofaSecs.filter(s => s.titulo !== 'Finalização' && s.titulo !== 'Duelos & Físico' && s.titulo !== 'Defesa (Sofascore)' && s.titulo !== 'Disciplina & Regularidade'),
+    ];
+
+    const ultimoValor = extras.valorMercado.length ? extras.valorMercado[extras.valorMercado.length - 1] : null;
+    const url = location.origin + location.pathname + '?jogador=' + p.jogador_id;
+    const numLesoes = extras.lesoes.length;
+
+    return `
+        <button class="perfil-voltar" onclick="voltarAoScoutTerminal()">← Voltar ao Scout Terminal</button>
+
+        <div class="perfil-header">
+            <div>
+                <div class="perfil-nome">${esc(p.nome)}</div>
+                <div class="perfil-sub">
+                    <span class="pos-badge" style="background:${cor}">${POSICAO_LABEL[p.posicao_api] || esc(p.posicao_api)}</span>
+                    <span class="player-row-meta">${crestHTML(p.equipa, p.clube_transfermarkt_id, 16)} ${esc(p.equipa)} · ${nacionalidadeHTML(p.nacionalidade)}</span>
+                    ${emprestadoBadgeHTML(p.clube_dono)}
+                </div>
+            </div>
+            ${scoreRingHTML(p.scouting_score, 'perfil-score')}
+        </div>
+
+        <div class="perfil-divisor"></div>
+
+        <div class="perfil-kpis">
+            <div class="perfil-kpi"><div class="n">${p.jogos ?? 0}</div><div class="l">Jogos</div></div>
+            <div class="perfil-kpi"><div class="n">${p.minutos ?? 0}</div><div class="l">Min.</div></div>
+            <div class="perfil-kpi"><div class="n">${p.golos ?? 0}</div><div class="l">Golos</div></div>
+            <div class="perfil-kpi"><div class="n">${p.classificacao_media ?? '—'}</div><div class="l">Rating</div></div>
+            <button class="perfil-share" onclick="partilharPerfil('${url}')">🔗 Partilhar perfil</button>
+        </div>
+
+        <div class="perfil-divisor"></div>
+
+        <div class="perfil-tabs">
+            <button class="perfil-tab-btn active" data-tab="geral" onclick="mostrarPerfilTab('geral')">Visão Geral</button>
+            <button class="perfil-tab-btn" data-tab="atributos" onclick="mostrarPerfilTab('atributos')">Estatísticas</button>
+            <button class="perfil-tab-btn" data-tab="transferencias" onclick="mostrarPerfilTab('transferencias')">Transferências</button>
+            <button class="perfil-tab-btn" data-tab="lesoes" onclick="mostrarPerfilTab('lesoes')">Lesões <span class="tab-badge">${numLesoes}</span></button>
+        </div>
+
+        <div id="perfilTab-geral" class="perfil-tab-content active">
+            <div class="stat-section-title">Forma recente (últimos 5 jogos) — dados por jogo via API-Football</div>
+            ${renderUltimos5HTML(extras.ultimos5, p.posicao_api)}
+            <div class="tab-geral-grid">
+                <div>
+                    <div class="perfil-avatar" style="background:${cor}">${initials(p.nome)}</div>
+                    <div class="bio-grid bio-list" style="grid-template-columns:1fr">
+                        ${bio.map(([l, v]) => `<div class="bio-item"><div class="l">${esc(l)}</div><div class="v">${l === 'Nacionalidade' ? nacionalidadeHTML(v) : esc(v)}</div></div>`).join('')}
+                    </div>
+                    ${salarioAtual ? `<div class="mv-loading" style="margin-top:6px;text-align:left">Salário via salarysport.com (${esc(salarioAtual.temporada)}) — valores na moeda da fonte (${esc(salarioAtual.moeda)}), pode não refletir a moeda real da liga.</div>` : ''}
+                </div>
+                <div>
+                    <div class="stat-section-title">Posição detalhada</div>
+                    ${drawPosicaoDetalhada(p.posicao_principal, p.posicoes_secundarias)}
+                </div>
+                <div>
+                    <div class="stat-section-title">Heatmap</div>
+                    ${drawHeatmap(extras.heatmap)}
+                </div>
+            </div>
+        </div>
+
+        <div id="perfilTab-atributos" class="perfil-tab-content">
+            <div class="radar-title" style="text-align:left;margin-bottom:16px">Estatísticas — ${esc(p.equipa)} · ${esc(p.competicao)}</div>
+            ${tacaSecs.length ? `
+                <div class="pill-group" style="margin-bottom:18px">
+                    <button class="pill active" data-competicao-stats="liga" onclick="mostrarCompeticaoStats('liga')">${esc(p.competicao)}</button>
+                    <button class="pill" data-competicao-stats="taca" onclick="mostrarCompeticaoStats('taca')">Taça de Portugal</button>
+                </div>
+            ` : ''}
+            <div id="statsCompeticaoLiga">${todasSecoesAtributos.map(renderStatSectionSplit).join('')}</div>
+            ${tacaSecs.length ? `<div id="statsCompeticaoTaca" class="hidden">${tacaSecs.map(renderStatSectionSplit).join('')}</div>` : ''}
+        </div>
+
+        <div id="perfilTab-transferencias" class="perfil-tab-content">
+            <div class="stat-section-title">Evolução do valor de mercado</div>
+            <div class="mv-header"><span></span><span class="atual">${ultimoValor ? 'Atual: ' + formatarValorCompacto(ultimoValor.valor) : ''}</span></div>
+            ${drawValorMercadoChart(extras.valorMercado)}
+            <div class="stat-section-title" style="margin-top:28px">Histórico de transferências</div>
+            ${renderTransferenciasTabela(extras.transferencias)}
+        </div>
+
+        <div id="perfilTab-lesoes" class="perfil-tab-content">
+            ${renderRiscoLesao(extras.lesoes)}
+            <div class="stat-section-title">Dias parado por lesão</div>
+            ${drawLesoesChart(extras.lesoes) || '<div class="mv-loading">Sem histórico de lesões.</div>'}
+            <div class="stat-section-title" style="margin-top:20px">Histórico de lesões</div>
+            ${renderLesoes(extras.lesoes)}
+        </div>
+    `;
+}
+
+function mostrarPerfilTab(tab){
+    document.querySelectorAll('.perfil-tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.perfil-tab-btn').forEach(el => el.classList.remove('active'));
+    $(`perfilTab-${tab}`).classList.add('active');
+    document.querySelector(`.perfil-tab-btn[data-tab="${tab}"]`).classList.add('active');
+
+    // Em vez de tentar preservar um scrollTop absoluto (que "salta"
+    // de forma brusca quando a aba nova tem menos conteúdo do que a
+    // anterior e o browser é forçado a fazer clamp), faz scroll suave
+    // até à barra de abas -- fica sempre consistente e previsível.
+    document.querySelector('.perfil-tabs').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+async function carregarPerfilCompleto(jogadorId){
+    $('perfilContent').innerHTML = '<p class="empty">A carregar perfil…</p>';
+
+    if (!epocaAtual) await loadSeasons();
+
+    let p = jogadoresCache.find(x => x.jogador_id === jogadorId);
+    if (!p){
+        const todos = await api(`/api/scouting?epoca=${encodeURIComponent(epocaAtual)}`);
+        p = todos.find(x => x.jogador_id === jogadorId);
+    }
+    if (!p){
+        $('perfilContent').innerHTML = '<p class="empty">Jogador não encontrado para esta época.</p>';
+        return;
+    }
+
+    const [valorMercado, transferencias, lesoes, sofascore, tacaSofascore, heatmap, ultimos5, salarios] = await Promise.all([
+        api(`/api/jogador/${jogadorId}/valor_mercado`),
+        api(`/api/jogador/${jogadorId}/transferencias`),
+        api(`/api/jogador/${jogadorId}/lesoes`),
+        api(`/api/jogador/${jogadorId}/sofascore`),
+        api(`/api/jogador/${jogadorId}/sofascore?liga_id=336`),
+        api(`/api/jogador/${jogadorId}/heatmap`),
+        api(`/api/jogador/${jogadorId}/ultimos5`),
+        api(`/api/jogador/${jogadorId}/salario`),
+    ]);
+
+    $('perfilContent').innerHTML = renderPerfilCompleto(p, { valorMercado, transferencias, lesoes, sofascore, tacaSofascore, heatmap, ultimos5, salarios });
+}
+
+/* ============================================================
+   PERFIL DE CLUBE (plantel completo)
+============================================================ */
+let clubeAtualJogadores = [];
+
+function renderClubePlayers(){
+    $('clubePlayersGrid').innerHTML = clubeAtualJogadores.length
+        ? clubeAtualJogadores.map(p => renderPlayerRow(p, 'renderClubePlayers')).join('')
+        : '<tr><td colspan="9"><p class="empty">Sem jogadores.</p></td></tr>';
+}
+
+function mostrarCompeticaoStats(tipo){
+    $('statsCompeticaoLiga').classList.toggle('hidden', tipo !== 'liga');
+    $('statsCompeticaoTaca').classList.toggle('hidden', tipo !== 'taca');
+    document.querySelectorAll('[data-competicao-stats]').forEach(btn =>
+        btn.classList.toggle('active', btn.dataset.competicaoStats === tipo)
+    );
+}
+
+function mostrarClubeTab(tab){
+    const container = $('clubeContent');
+    container.querySelectorAll('.perfil-tab-content').forEach(el => el.classList.remove('active'));
+    container.querySelectorAll('.perfil-tab-btn').forEach(el => el.classList.remove('active'));
+    container.querySelector(`#clubeTab-${tab}`).classList.add('active');
+    container.querySelector(`.perfil-tab-btn[data-tab="${tab}"]`).classList.add('active');
+}
+
+function renderTrofeusClube(trofeus){
+    if (!trofeus || !trofeus.length){
+        return '<p class="empty">Sem troféus registados para este clube.</p>';
+    }
+    return `
+        <div class="trofeus-lista">
+            ${trofeus.map(t => `
+                <div class="trofeu-card">
+                    <div class="trofeu-qtd">${t.quantidade != null ? t.quantidade + 'x' : ''}</div>
+                    <div class="trofeu-info">
+                        <div class="trofeu-nome">${esc(t.nome_trofeu)}</div>
+                        <div class="trofeu-epocas">${(t.epocas || []).join(', ')}</div>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function toggleJogoDetalhe(el){
+    el.classList.toggle('open');
+}
+
+function renderJogoDetalheHTML(r){
+    const golos = r.golos || [];
+    const golosHTML = golos.length
+        ? [...golos].sort((a, b) => a.minuto - b.minuto).map(g => {
+            const golDoAdversario = g.equipa === r.adversario;
+            const golEhCasa = r.em_casa ? !golDoAdversario : golDoAdversario;
+            const conteudo = `<span class="min">${g.minuto}'</span> ⚽ ${esc(g.jogador)}`;
+            return `
+                <div class="jogo-golo-linha">
+                    <div class="jogo-golo-lado jogo-golo-esq">${golEhCasa ? conteudo : ''}</div>
+                    <div class="jogo-golo-lado jogo-golo-dir">${!golEhCasa ? conteudo : ''}</div>
+                </div>
+            `;
+        }).join('')
+        : '<div class="jogo-golo empty">Sem golos registados.</div>';
+    const mvpHTML = r.mvp_nome
+        ? `<div class="jogo-mvp">⭐ MVP: <strong>${esc(r.mvp_nome)}</strong> (${esc(r.mvp_equipa)}) — ${r.mvp_rating}</div>`
+        : '';
+    return `${golosHTML}${mvpHTML}`;
+}
+
+function renderMvpClube(lista){
+    if (!lista || !lista.length){
+        return '<p class="empty">Sem dados de MVP para esta época.</p>';
+    }
+    const max = Math.max(...lista.map(l => l.vezes), 1);
+    return lista.map(l => `
+        <div class="bar-row">
+            <div class="top"><span>${esc(l.jogador)}</span><span>${l.vezes}x MVP</span></div>
+            <div class="bar-track"><div class="bar-fill" style="width:${l.vezes / max * 100}%"></div></div>
+        </div>
+    `).join('');
+}
+
+function renderJogoCardHTML(r, clube){
+    const cor = CORES_FORMA[r.resultado] || 'var(--muted)';
+    const nomeCasa = r.em_casa ? clube.nome : r.adversario;
+    const nomeFora = r.em_casa ? r.adversario : clube.nome;
+    const crestCasa = r.em_casa ? crestHTML(clube.nome, clube.transfermarkt_id, 26) : crestHTML(r.adversario, null, 26);
+    const crestFora = r.em_casa ? crestHTML(r.adversario, null, 26) : crestHTML(clube.nome, clube.transfermarkt_id, 26);
+    return `
+        <div class="jogo-card" style="border-left-color:${cor}" onclick="toggleJogoDetalhe(this)">
+            <div class="jogo-linha">
+                <div class="jogo-lado jogo-lado-casa">${crestCasa}<span>${esc(nomeCasa)}</span></div>
+                <div class="jogo-placar">${r.golos_casa} - ${r.golos_fora}</div>
+                <div class="jogo-lado jogo-lado-fora"><span>${esc(nomeFora)}</span>${crestFora}</div>
+            </div>
+            <div class="jogo-meta">${formatarData(r.data_jogo)}${r.fase ? ' · ' + esc(r.fase) : ''} <span class="chevron">▾</span></div>
+            <div class="jogo-detalhe">${renderJogoDetalheHTML(r)}</div>
+        </div>
+    `;
+}
+
+function renderResultadosClube(resultados, clube){
+    if (!resultados || !resultados.length){
+        return '<p class="empty">Sem resultados registados para esta época.</p>';
+    }
+    const grupos = {};
+    for (const r of resultados){
+        (grupos[r.competicao] = grupos[r.competicao] || []).push(r);
+    }
+    const ordenados = Object.entries(grupos).sort((a, b) => b[1].length - a[1].length);
+    return ordenados.map(([competicao, lista]) => `
+        <div class="resultados-grupo">
+            <div class="stat-section-title">${esc(competicao)} (${lista.length})</div>
+            ${lista.map(r => renderJogoCardHTML(r, clube)).join('')}
+        </div>
+    `).join('');
+}
+
+function renderClubePagina(clube, jogadores, trofeus, resultados, mvps){
+    return `
+        <button class="perfil-voltar" onclick="voltarAoScoutTerminal()">← Voltar ao Scout Terminal</button>
+        <div class="perfil-header">
+            <div style="display:flex;align-items:center;gap:20px">
+                ${crestHTML(clube.nome, clube.transfermarkt_id, 64)}
+                <div>
+                    <div class="perfil-nome">${esc(clube.nome)}</div>
+                    <div class="perfil-sub"><span class="player-row-meta">${esc(clube.pais || '—')} · ${jogadores.length} jogadores</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="perfil-divisor"></div>
+        <div class="perfil-tabs">
+            <button class="perfil-tab-btn active" data-tab="plantel" onclick="mostrarClubeTab('plantel')">Plantel</button>
+            <button class="perfil-tab-btn" data-tab="trofeus" onclick="mostrarClubeTab('trofeus')">Troféus${trofeus.length ? ` (${trofeus.length})` : ''}</button>
+            <button class="perfil-tab-btn" data-tab="resultados" onclick="mostrarClubeTab('resultados')">Resultados${resultados.length ? ` (${resultados.length})` : ''}</button>
+            <button class="perfil-tab-btn" data-tab="mvp" onclick="mostrarClubeTab('mvp')">MVP</button>
+        </div>
+        <div id="clubeTab-plantel" class="perfil-tab-content active">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Jogador</th>
+                            <th>Posição</th>
+                            <th class="num">Idade</th>
+                            <th class="num">Jogos</th>
+                            <th class="num">Golos</th>
+                            <th class="num">Assist.</th>
+                            <th class="num">Rating</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="clubePlayersGrid"></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="clubeTab-trofeus" class="perfil-tab-content">
+            ${renderTrofeusClube(trofeus)}
+        </div>
+        <div id="clubeTab-resultados" class="perfil-tab-content">
+            ${renderResultadosClube(resultados, clube)}
+        </div>
+        <div id="clubeTab-mvp" class="perfil-tab-content">
+            ${renderMvpClube(mvps)}
+        </div>
+    `;
+}
+
+async function carregarClubePagina(transfermarktId){
+    $('clubeContent').innerHTML = '<p class="empty">A carregar plantel…</p>';
+
+    if (!epocaAtual) await loadSeasons();
+    if (!jogadoresCache.length){
+        jogadoresCache = await api(`/api/scouting?epoca=${encodeURIComponent(epocaAtual)}`);
+    }
+
+    const tmid = Number(transfermarktId);
+    clubeAtualJogadores = jogadoresCache
+        .filter(p => p.clube_transfermarkt_id === tmid)
+        .sort((a, b) => (b.scouting_score || 0) - (a.scouting_score || 0));
+
+    if (!clubeAtualJogadores.length){
+        $('clubeContent').innerHTML = '<p class="empty">Clube não encontrado ou sem jogadores nesta época.</p>';
+        return;
+    }
+
+    const clubesLista = await api('/api/clubes');
+    const clubeInfo = clubesLista.find(c => c.transfermarkt_id === tmid)
+        || {nome: clubeAtualJogadores[0].equipa, pais: clubeAtualJogadores[0].nacionalidade, transfermarkt_id: tmid};
+
+    const trofeus = clubeInfo.id ? await api(`/api/clube/${clubeInfo.id}/trofeus`) : [];
+    const resultados = clubeInfo.id ? await api(`/api/clube/${clubeInfo.id}/resultados`) : [];
+    const mvps = clubeInfo.id ? await api(`/api/clube/${clubeInfo.id}/mvp`) : [];
+
+    $('clubeContent').innerHTML = renderClubePagina(clubeInfo, clubeAtualJogadores, trofeus, resultados, mvps);
+    renderClubePlayers();
+}
+
+$('clubeContent').addEventListener('click', e => {
+    const row = e.target.closest('.player-row');
+    if (!row || !row.closest('#clubePlayersGrid')) return;
+    const id = Number(row.dataset.id);
+    openRowId = openRowId === id ? null : id;
+    const scrollY = window.scrollY;
+    renderClubePlayers();
+    window.scrollTo(0, scrollY);
+});
+
+/* ============================================================
+   COMPARAÇÃO DE JOGADORES
+============================================================ */
+function todasLinhasStats(p, sofascoreData){
+    const secoes = [...statSections(p), ...sofascoreSections(sofascoreData, p.posicao_api, p.percentis_chip)];
+    const linhas = [];
+    secoes.forEach(sec => {
+        linhas.push({tipo: 'titulo', titulo: sec.titulo});
+        sec.linhas.forEach(l => linhas.push({tipo: 'linha', label: l[0], valor: l[1], pct: l[2]}));
+    });
+    return linhas;
+}
+
+function renderComparacao(jogadores, sofascoreLista){
+    const linhasPorJogador = jogadores.map((p, i) => todasLinhasStats(p, sofascoreLista[i]));
+    const linhasBase = linhasPorJogador[0] || [];
+
+    const linhasHtml = linhasBase.map(linhaBase => {
+        if (linhaBase.tipo === 'titulo'){
+            return `<tr class="titulo"><td colspan="${jogadores.length + 1}">${esc(linhaBase.titulo)}</td></tr>`;
+        }
+        const celulas = jogadores.map((p, i) => {
+            const correspondente = linhasPorJogador[i].find(l => l.tipo === 'linha' && l.label === linhaBase.label);
+            if (!correspondente) return '<td>—</td>';
+            if (correspondente.pct === null || correspondente.pct === undefined){
+                return `<td>${esc(correspondente.valor)}</td>`;
+            }
+            const c = percentilCor(correspondente.pct);
+            return `<td><span class="v-chip" style="background:${c}22;color:${c};border-color:${c}66">${esc(correspondente.valor)}</span></td>`;
+        }).join('');
+        return `<tr><td>${esc(linhaBase.label)}</td>${celulas}</tr>`;
+    }).join('');
+
+    return `
+        <button class="perfil-voltar" onclick="voltarAoScoutTerminal()">← Voltar ao Scout Terminal</button>
+        <div class="perfil-nome" style="margin-bottom:20px">Comparação de Jogadores</div>
+
+        <div class="comparar-table-wrap">
+        <table class="comparar-table">
+            <thead>
+                <tr>
+                    <th></th>
+                    ${jogadores.map(p => `
+                        <th class="comparar-header-col">
+                            <div class="perfil-avatar" style="width:64px;height:64px;margin:0 auto 10px;background:${positionColor(p.posicao_principal)};font-size:22px">${initials(p.nome)}</div>
+                            <div style="font-family:var(--font-display);font-size:20px;cursor:pointer" onclick="abrirPerfilCompleto(${p.jogador_id})">${esc(p.nome)}</div>
+                            <div class="player-row-meta" style="justify-content:center">${crestHTML(p.equipa, p.clube_transfermarkt_id, 15)} ${esc(p.equipa)}</div>
+                            <div style="margin-top:8px">${scoreRingHTML(p.scouting_score)}</div>
+                            <button class="comparar-remover" onclick="removerDaComparacao(${p.jogador_id})" title="Remover">✕</button>
+                        </th>
+                    `).join('')}
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Jogos</td>${jogadores.map(p => `<td>${p.jogos ?? 0}</td>`).join('')}</tr>
+                <tr><td>Minutos</td>${jogadores.map(p => `<td>${p.minutos ?? 0}</td>`).join('')}</tr>
+                <tr><td>Rating</td>${jogadores.map(p => `<td>${p.classificacao_media ?? '—'}</td>`).join('')}</tr>
+            </tbody>
+        </table>
+        </div>
+
+        <div class="comparar-radars">
+            ${drawRadarOverlay(jogadores)}
+        </div>
+
+        <div class="comparar-table-wrap">
+        <table class="comparar-table">
+            <tbody>
+                ${linhasHtml}
+            </tbody>
+        </table>
+        </div>
+    `;
+}
+
+async function carregarComparacao(idsStr){
+    $('compararContent').innerHTML = '<p class="empty">A carregar comparação…</p>';
+
+    if (!epocaAtual) await loadSeasons();
+    if (!jogadoresCache.length){
+        jogadoresCache = await api(`/api/scouting?epoca=${encodeURIComponent(epocaAtual)}`);
+    }
+
+    const ids = String(idsStr).split(',').map(Number).filter(Boolean);
+    const jogadores = ids.map(id => jogadoresCache.find(p => p.jogador_id === id)).filter(Boolean);
+
+    if (jogadores.length < 2){
+        $('compararContent').innerHTML = '<p class="empty">Escolhe pelo menos 2 jogadores válidos para comparar.</p>';
+        return;
+    }
+
+    const sofascoreLista = await Promise.all(jogadores.map(p => api(`/api/jogador/${p.jogador_id}/sofascore`)));
+
+    $('compararContent').innerHTML = renderComparacao(jogadores, sofascoreLista);
+}
+
+function removerDaComparacao(jogadorId){
+    compararSelecionados = compararSelecionados.filter(x => x.id !== jogadorId);
+    if (compararSelecionados.length < 2){
+        voltarAoScoutTerminal();
+        return;
+    }
+    abrirComparacao();
+}
+
+const PAGINAS_LARGAS = ['perfil', 'clube', 'comparar', 'dashboard', 'jogadores', 'clubes'];
+
+function mostrarPagina(pagina){
+    document.querySelectorAll('.page').forEach(x => x.classList.add('hidden'));
+    $(pagina).classList.remove('hidden');
+    document.scrollingElement.scrollTop = 0;
+
+    const usarTopbar = PAGINAS_LARGAS.includes(pagina);
+    document.querySelector('aside').classList.toggle('hidden', usarTopbar);
+    $('topbarPerfil').classList.toggle('hidden', !usarTopbar);
+
+    document.querySelectorAll('aside nav button[data-page], #topbarPerfil nav button[data-page]').forEach(b => {
+        b.classList.toggle('active', b.dataset.page === pagina);
+    });
+}
+
+function navegarPara(pagina){
+    const url = new URL(location.href);
+    url.searchParams.delete('jogador');
+    url.searchParams.delete('clube');
+    url.searchParams.delete('comparar');
+    if (pagina === 'dashboard'){
+        url.searchParams.delete('pagina');
+    } else {
+        url.searchParams.set('pagina', pagina);
+    }
+    history.pushState({}, '', url);
+    mostrarPagina(pagina);
+    refresh(pagina);
+}
+
+function abrirPerfilCompleto(jogadorId){
+    const url = new URL(location.href);
+    url.searchParams.set('jogador', jogadorId);
+    url.searchParams.delete('clube');
+    url.searchParams.delete('comparar');
+    history.pushState({}, '', url);
+    mostrarPagina('perfil');
+    carregarPerfilCompleto(jogadorId);
+}
+
+function abrirClubePagina(transfermarktId){
+    if (!transfermarktId) return;
+    const url = new URL(location.href);
+    url.searchParams.set('clube', transfermarktId);
+    url.searchParams.delete('jogador');
+    url.searchParams.delete('comparar');
+    history.pushState({}, '', url);
+    mostrarPagina('clube');
+    carregarClubePagina(transfermarktId);
+}
+
+function voltarAoScoutTerminal(){
+    navegarPara('jogadores');
+}
+
+function partilharPerfil(url){
+    navigator.clipboard.writeText(url).then(() => {
+        alert('Link copiado: ' + url);
+    }).catch(() => {
+        prompt('Copia o link:', url);
+    });
+}
+
+window.addEventListener('popstate', () => {
+    const jogadorId = new URLSearchParams(location.search).get('jogador');
+    const clubeId = new URLSearchParams(location.search).get('clube');
+    const compararIds = new URLSearchParams(location.search).get('comparar');
+    if (jogadorId){
+        mostrarPagina('perfil');
+        carregarPerfilCompleto(Number(jogadorId));
+    } else if (clubeId){
+        mostrarPagina('clube');
+        carregarClubePagina(Number(clubeId));
+    } else if (compararIds){
+        mostrarPagina('comparar');
+        carregarComparacao(compararIds);
+    } else {
+        mostrarPagina('jogadores');
+    }
+});
+
+/* ============================================================
+   NAVEGAÇÃO
+============================================================ */
+async function refresh(page){
+    try{
+        if (page === 'dashboard') await loadDashboard();
+        if (page === 'jogadores') await loadPlayers();
+        if (page === 'clubes') await loadClubs();
+    }catch(e){
+        document.querySelector(`#${page}`).insertAdjacentHTML('beforeend', `<p class="error">${esc(e.message)}</p>`);
+    }
+}
+
+document.querySelectorAll('aside nav button, #topbarPerfil nav button').forEach(b => b.addEventListener('click', () => {
+    navegarPara(b.dataset.page);
+}));
+
+$('playerSearch').addEventListener('input', () => {
+    $('limparPesquisa').classList.toggle('hidden', !$('playerSearch').value);
+    renderPlayers();
+});
+$('limparPesquisa').addEventListener('click', () => {
+    $('playerSearch').value = '';
+    $('limparPesquisa').classList.add('hidden');
+    renderPlayers();
+    $('playerSearch').focus();
+});
+
+document.querySelectorAll('.player-table-wrap .sort-col').forEach(el => {
+    el.addEventListener('click', () => ordenarPor(el.dataset.sort));
+});
+atualizarHeaderOrdenacao();
+
+$('toggleFiltrosAvancados').addEventListener('click', () => {
+    const aberto = $('filtrosAvancados').classList.toggle('open');
+    $('chevronFiltrosAvancados').textContent = aberto ? '▴' : '▾';
+});
+
+function numOuNull(valor){
+    return valor === '' ? null : Number(valor);
+}
+
+$('idadeMin').addEventListener('input', () => { filtroIdadeMin = numOuNull($('idadeMin').value); renderPlayers(); });
+$('idadeMax').addEventListener('input', () => { filtroIdadeMax = numOuNull($('idadeMax').value); renderPlayers(); });
+$('alturaMin').addEventListener('input', () => { filtroAlturaMin = numOuNull($('alturaMin').value); renderPlayers(); });
+$('alturaMax').addEventListener('input', () => { filtroAlturaMax = numOuNull($('alturaMax').value); renderPlayers(); });
+$('filtroPe').addEventListener('change', () => { filtroPe = $('filtroPe').value; renderPlayers(); });
+
+$('filtroContratoSelect').addEventListener('change', () => {
+    filtroContratoSel = $('filtroContratoSelect').value;
+    renderPlayers();
+});
+
+$('ratingMin').addEventListener('input', () => { filtroRatingMin = numOuNull($('ratingMin').value); renderPlayers(); });
+$('ratingMax').addEventListener('input', () => { filtroRatingMax = numOuNull($('ratingMax').value); renderPlayers(); });
+$('golosPor90Min').addEventListener('input', () => { filtroGolosPor90Min = numOuNull($('golosPor90Min').value); renderPlayers(); });
+$('xgEficaciaMin').addEventListener('input', () => { filtroXgEficaciaMin = numOuNull($('xgEficaciaMin').value); renderPlayers(); });
+$('xgEficaciaMax').addEventListener('input', () => { filtroXgEficaciaMax = numOuNull($('xgEficaciaMax').value); renderPlayers(); });
+$('valorMercadoMin').addEventListener('input', () => { filtroValorMercadoMin = numOuNull($('valorMercadoMin').value); renderPlayers(); });
+$('valorMercadoMax').addEventListener('input', () => { filtroValorMercadoMax = numOuNull($('valorMercadoMax').value); renderPlayers(); });
+$('filtroEmprestados').addEventListener('change', () => { filtroEmprestados = $('filtroEmprestados').checked; renderPlayers(); });
+$('filtroTaca').addEventListener('change', () => { filtroTaca = $('filtroTaca').checked; renderPlayers(); });
+
+$('limparFiltrosAvancados').addEventListener('click', () => {
+    filtroIdadeMin = null; filtroIdadeMax = null;
+    filtroAlturaMin = null; filtroAlturaMax = null;
+    filtroPe = ''; filtroPosicao.clear(); filtroPosSecundaria = new Set(); filtroContratoSel = '';
+    filtroRatingMin = null; filtroRatingMax = null; filtroGolosPor90Min = null;
+    filtroXgEficaciaMin = null; filtroXgEficaciaMax = null;
+    filtroValorMercadoMin = null; filtroValorMercadoMax = null;
+    filtroEmprestados = false; filtroTaca = false; filtroNacionalidade.clear();
+    $('idadeMin').value = ''; $('idadeMax').value = '';
+    $('alturaMin').value = ''; $('alturaMax').value = '';
+    $('filtroPe').value = '';
+    $('filtroContratoSelect').value = '';
+    $('ratingMin').value = ''; $('ratingMax').value = '';
+    $('golosPor90Min').value = '';
+    $('xgEficaciaMin').value = ''; $('xgEficaciaMax').value = '';
+    $('valorMercadoMin').value = ''; $('valorMercadoMax').value = '';
+    $('filtroEmprestados').checked = false;
+    $('filtroTaca').checked = false;
+    $('positionPills').querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+    $('positionPills').querySelector('.pill').classList.add('active');
+    $('posSecundariaPills').querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+    $('posSecundariaPills').querySelector('.pill').classList.add('active');
+    renderNacionalidadePills();
+    renderPlayers();
+});
+
+$('procurarFiltrosAvancados').addEventListener('click', () => {
+    renderPlayers();
+    $('filtrosAvancados').classList.remove('open');
+    $('chevronFiltrosAvancados').textContent = '▾';
+});
+
+$('jogosMinInput').addEventListener('input', () => {
+    filtroJogosMin = numOuNull($('jogosMinInput').value) ?? 0;
+    renderPlayers();
+});
+
+$('limparFiltrosPrincipais').addEventListener('click', () => {
+    filtroLiga = ''; filtroClube = ''; filtroJogosMin = 0;
+    $('leagueSelect').value = '';
+    $('clubSelect').value = '';
+    $('jogosMinInput').value = '0';
+    popularFiltrosDependentes();
+    renderPlayers();
+});
+
+const jogadorInicial = new URLSearchParams(location.search).get('jogador');
+const clubeInicial = new URLSearchParams(location.search).get('clube');
+const compararInicial = new URLSearchParams(location.search).get('comparar');
+const paginaInicial = new URLSearchParams(location.search).get('pagina');
+if (jogadorInicial){
+    mostrarPagina('perfil');
+    carregarPerfilCompleto(Number(jogadorInicial));
+} else if (clubeInicial){
+    mostrarPagina('clube');
+    carregarClubePagina(Number(clubeInicial));
+} else if (compararInicial){
+    mostrarPagina('comparar');
+    carregarComparacao(compararInicial);
+} else if (paginaInicial){
+    mostrarPagina(paginaInicial);
+    refresh(paginaInicial);
+} else {
+    mostrarPagina('dashboard');
+    refresh('dashboard');
+}
+</script>
+</body>
+</html>
